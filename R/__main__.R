@@ -1,6 +1,6 @@
 ########### MAIN ###########
 t_start = Sys.time()
-#To load the required packages, use this
+# Load the required packages
 source("packageLoad.R")
 
 #If you have access to a Bloomberg Terminal, then the data is collected fresh from Bloomberg. Otherwise, the data stored on the computer in /data is loaded in
