@@ -21,29 +21,20 @@ for (i in 1:length(predictedValuesARIMA)) {
 }
 names(predictedValuesRF) <- colnames(predictedValuesRFMat) <- sectorNames
 
-accSetRF <- NULL
-for (i in 1:ncol(predictedValuesRFMat)) {
-  testSet <- predictedValuesRFMat[,i]
-  realSet <- sectorPrices[[i]][["Testing Set"]][,1]
-  resultSet <- NULL
-  for (j in 1:length(testSet)) {
-    if ((testSet[j] >= (realSet[j]*(1-GLOBAL_ACCURACY))) && (testSet[j] <= (realSet[j]*(1+GLOBAL_ACCURACY)))) {
-      resultSet[j] <- 1
-    } else {
-      resultSet[j] <- 0
-    }
-  }
-  accSetRF <- c(accSetRF,(sum(resultSet)/length(resultSet)))
-  print(paste(sectorNames[i]," Accuracy: ",accSetRF[i],sep = ''))
+forestMAPE <- sapply(1:ncol(predictedValuesRFMat), FUN=function(i) {
+  mean(abs((predictedValuesRFMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+})
+for (i in 1:length(forestMAPE)) {
+  print(paste(sectorNames[i], " MAPE: ", percent(forestMAPE[i], 0.001), sep = ''))
 }
-names(accSetRF) <- sectorNames
+names(forestMAPE) <- sectorNames
 
 size <- size + 1
 if (size == 1) {
-  accuracyMatrix[1,] <- accSetRF
+  accuracyMatrix[1,] <- forestMAPE
   rownames(accuracyMatrix) <- "Random Forest"
 } else {
-  accuracyMatrix <- rbind(accuracyMatrix,accSetRF)
+  accuracyMatrix <- rbind(accuracyMatrix, forestMAPE)
   rownames(accuracyMatrix)[size] <- "Random Forest"
 }
 

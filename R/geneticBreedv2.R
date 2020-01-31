@@ -10,46 +10,32 @@ sectorPriceMatTest = sectorPriceMat[index(sectorPriceMat) >= index(sectorPrices$
 
 
 # Create master prediction and accuracy database
-masterPredictions = emptySectorList
-masterPredictionsMat = as.data.frame(matrix(ncol = length(masterPredictions),nrow = nrow(predictedValuesLinearMat)))
+masterPredictionsMat = as.data.frame(matrix(ncol = length(emptySectorList),nrow = nrow(predictedValuesLinearMat)))
 
 predictionDatabase <- array(0,dim = c(nrow(predictedValuesLinearMat),ncol(predictedValuesLinearMat),size))
 predictionDatabase[,,1] <- as.matrix(predictedValuesLinearMat)
 predictionDatabase[,,2] <- as.matrix(predictedValuesARIMAMat)
 predictionDatabase[,,3] <- as.matrix(predictedValuesRFMat)
 
+# Create inverse weighted average prediction based on Mean Average Percent Error (MAPE)
+#  i.e. models with lowest MAPE gets highest weight and vice versa
+# Then apply those weights to the predictions from the three models to come up with the "master prediction"
+#  for each sector across the testing period
 for (i in 1:length(masterPredictions)) {
-  totalPred <- rep(0,nrow(predictedValuesLinearMat))
-  for (j in 1:size) {
-    if (sum(accuracyMatrix[,i]) == 0) {
-      accWeight <- 0
-    } else {
-      accWeight <- (as.numeric(accuracyMatrix[j,i])/sum(accuracyMatrix[,i]))
-    }
-    totalPred = totalPred + (accWeight*predictionDatabase[,i,j])
-  }
-  masterPredictions[[i]] <- totalPred
-  masterPredictionsMat[,i] <- totalPred
+  factor <- sum(accuracyMatrix[,i]) / accuracyMatrix[,i]
+  accWeight <- (factor / sum(factor))
+  masterPredictionsMat[,i] <- apply(predictionDatabase[,i,], MARGIN = 1, FUN=function(sectorPrice){accWeight %*% sectorPrice})
 }
-names(masterPredictions) <- colnames(masterPredictionsMat) <- sectorNames
+colnames(masterPredictionsMat) <- sectorNames
 masterPredictionsMat = as.xts(masterPredictionsMat, order.by = index(sectorPrices$IT$`Testing Set`))
 
-accSetOverall <- NULL
-for (i in 1:ncol(masterPredictionsMat)) {
-  testSet <- masterPredictionsMat[,i]
-  realSet <- sectorPrices[[i]][["Testing Set"]][,1]
-  resultSet <- NULL
-  for (j in 1:length(testSet)) {
-    if ((testSet[j] >= (realSet[j]*(1-GLOBAL_ACCURACY))) && (testSet[j] <= (realSet[j]*(1+GLOBAL_ACCURACY)))) {
-      resultSet[j] <- 1
-    } else {
-      resultSet[j] <- 0
-    }
-  }
-  accSetOverall <- c(accSetOverall,(sum(resultSet)/length(resultSet)))
-  print(paste(sectorNames[i]," Accuracy: ",accSetOverall[i],sep = ''))
+overallMAPE <- sapply(1:ncol(masterPredictionsMat), FUN=function(i) {
+  mean(abs((masterPredictionsMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+})
+for (i in 1:length(overallMAPE)) {
+  print(paste(sectorNames[i], " MAPE: ", percent(overallMAPE[i], 0.001), sep = ''))
 }
-names(accSetOverall) <- sectorNames
+names(overallMAPE) <- sectorNames
 
 covMat = cov((masterPredictionsMat/data.table::shift(masterPredictionsMat,1))[-1,])
 

@@ -86,38 +86,29 @@ for (i in 1:length(linear_models)) {
 names(predictedValuesLinear) <- sectorNames
 colnames(predictedValuesLinearMat) <- names(predictedValuesLinear)
 
-accSetLinear <- NULL
-for (i in 1:ncol(predictedValuesLinearMat)) {
-  testSet <- predictedValuesLinearMat[,i]
-  realSet <- sectorPrices[[i]][["Testing Set"]][,1]
-  resultSet <- NULL
-  for (j in 1:length(testSet)) {
-    if ((testSet[j] >= (realSet[j]*(1-GLOBAL_ACCURACY))) && (testSet[j] <= (realSet[j]*(1+GLOBAL_ACCURACY)))) {
-      resultSet[j] <- 1
-    } else {
-      resultSet[j] <- 0
-    }
-  }
-  accSetLinear <- c(accSetLinear,(sum(resultSet)/length(resultSet)))
-  print(paste(sectorNames[i]," Accuracy: ",accSetLinear[i],sep = ''))
+linearMAPE <- sapply(1:ncol(predictedValuesLinearMat), FUN=function(i) {
+  mean(abs((predictedValuesLinearMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+})
+for (i in 1:length(linearMAPE)) {
+  print(paste(sectorNames[i], " MAPE: ", percent(linearMAPE[i], 0.001), sep = ''))
 }
-names(accSetLinear) <- sectorNames
+names(linearMAPE) <- sectorNames
 
 plotAccLinear <- function() {
-  tmp <- accSetLinear
+  tmp <- linearMAPE
   tmp <- cbind(names(tmp),as.data.frame(tmp))
   colnames(tmp) <- c("Sectors", "Accuracy")
-  rSquareGGPlot <<- 'ggplot(tmp, aes(x=Sectors,y=Accuracy,ymax=1)) + geom_bar(stat = "identity") + geom_text(aes(label = round(Accuracy,digits = 4)),nudge_y=.02) + labs(title = "Accuracy, Linear Model (New)")'
+  rSquareGGPlot <<- 'ggplot(tmp, aes(x=Sectors,y=Accuracy)) + geom_bar(stat = "identity") + geom_text(aes(label = round(Accuracy,digits = 4)),nudge_y=.02) + labs(title = "Accuracy, Linear Model (New)")'
   eval(parse(text = rSquareGGPlot))
 }
 plotAccLinear()
 
 size <- size + 1
 if (size == 1) {
-  accuracyMatrix[1,] <- accSetLinear
+  accuracyMatrix[1,] <- linearMAPE
   rownames(accuracyMatrix) <- "Linear Regression"
 } else {
-  accuracyMatrix <- rbind(accuracyMatrix,accSetLinear)
+  accuracyMatrix <- rbind(accuracyMatrix, linearMAPE)
   rownames(accuracyMatrix)[size] <- "Linear Regression"
 }
 
