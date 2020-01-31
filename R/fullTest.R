@@ -47,15 +47,6 @@ ymax = ceiling(max(totalReturnComparison*10))*10
 recessionDatesdf = data.frame(xmin=c(as.Date("1990-07-02"), as.Date("2001-03-01"), as.Date("2007-11-30")), 
                               xmax=c(as.Date("1991-03-01"), as.Date("2001-11-01"), as.Date("2009-06-30")))
 
-# Put stats into dataframe and save image of it
-metrics = c("Period", "Return", "Risk", "Sharpe", "Daily 95% VaR", "Daily 95% CVaR", "1990 Recession", "2001 Recession", "2008 Recession")
-port_metrics = c("1990-2020", percent(port_cumulRet), percent(port_sd), round(port_cumulRet/port_sd, 2),
-                 percent(VaR(port, 0.95)), percent(CVaR(port, 0.95)), percent(unname(recessionTest[1,])))
-spx_metrics = c("1990-2020", percent(mkt_ret), percent(mkt_sd), round(mkt_ret/mkt_sd, 2),
-                percent(VaR(SPX_all, 0.95)), percent(CVaR(SPX_all, 0.95)), percent(unname(recessionTest[2,])))
-stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
-cowplot::save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
-
 
 # Relative Cumulative Returns (Full Period)
 {returnsGraph <- ggplot(returnComparison*100) +
@@ -114,6 +105,17 @@ rownames(recessionTest) = c("Portfolio", "SPX")
 colnames(recessionTest) = c("1990-1991", "2001", "2008-2009")
 recessionTest*100
 
+
+# Put stats into dataframe and save image of it
+metrics = c("Period", "Return", "Risk", "Sharpe", "Daily 95% VaR", "Daily 95% CVaR", "1990 Recession", "2001 Recession", "2008 Recession")
+port_metrics = c("1990-2020", percent(port_cumulRet), percent(port_sd), round(port_cumulRet/port_sd, 2),
+                 percent(VaR(port, 0.95)), percent(CVaR(port, 0.95)), percent(unname(recessionTest[1,])))
+spx_metrics = c("1990-2020", percent(mkt_ret), percent(mkt_sd), round(mkt_ret/mkt_sd, 2),
+                percent(VaR(SPX_all, 0.95)), percent(CVaR(SPX_all, 0.95)), percent(unname(recessionTest[2,])))
+stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
+cowplot::save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
+
+
 # Plot each sector's returns
 {sectorPricesdf = read.csv(paste("data/sectors.csv"), col.names=c("date", sectorNames))
 sectorPricesdf[,2:11] = returnCalculation(sectorPricesdf[,2:11])
@@ -131,11 +133,12 @@ ggsave(file.path(savePath, "sectorReturns.png"), plot=sectorReturns, width=8, he
 # Save weights into CSV file (date run, date of data, and weights)
 historyFile = "weightsHistory.csv"
 historyPath = file.path(getwd(), "results", historyFile)
-if(!file.exists(historyFile)) {
-  file.create(historyFile)
+if(!file.exists(historyPath)) {
+  file.create(historyPath)
+  cols = c("Run Date", "Data Date", sectorNames)
   headers = as.data.frame(matrix(ncol=length(cols), nrow=0))
   colnames(headers) = cols
   write.csv(headers, historyFile, row.names = F)
 }
 currentRun = t(as.matrix(c(as.character(Sys.Date()), as.character(as.Date(file.mtime("data/SPX.csv"))), weightsVector)))
-write.table(currentRun, file=historyFile, append = T, sep=",", row.names=F, col.names=F)
+write.table(currentRun, file=historyPath, append = T, sep=",", row.names=F, col.names=F)
