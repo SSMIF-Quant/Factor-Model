@@ -11,7 +11,6 @@ source("DataLoad.R")
 size <- 0
 accuracyMatrix <- matrix(nrow = 1,ncol = length(sectorNames))
 colnames(accuracyMatrix) <- sectorNames
-GLOBAL_ACCURACY <- 0.1
 
 #Linear Analysis of Data.
 source("linearAnalysis.R")
