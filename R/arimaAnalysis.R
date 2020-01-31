@@ -52,29 +52,20 @@ for (i in 1:length(arima_models)) {
 }
 colnames(predictedValuesARIMAMat) <- names(predictedValuesARIMA) <- sectorNames
 
-accSetARIMA <- NULL
-for (i in 1:ncol(predictedValuesARIMAMat)) {
-  testSet <- predictedValuesARIMAMat[,i]
-  realSet <- sectorPrices[[i]][["Testing Set"]][,1]
-  resultSet <- NULL
-  for (j in 1:length(testSet)) {
-    if ((testSet[j] >= (realSet[j]*(1-GLOBAL_ACCURACY))) && (testSet[j] <= (realSet[j]*(1+GLOBAL_ACCURACY)))) {
-      resultSet[j] <- 1
-    } else {
-      resultSet[j] <- 0
-    }
-  }
-  accSetARIMA <- c(accSetARIMA,(sum(resultSet)/length(resultSet)))
-  print(paste(sectorNames[i]," Accuracy: ",accSetARIMA[i],sep = ''))
+arimaMAPE <- sapply(1:ncol(predictedValuesARIMAMat), FUN=function(i) {
+  mean(abs((predictedValuesARIMAMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+})
+for (i in 1:length(arimaMAPE)) {
+  print(paste(sectorNames[i], " MAPE: ", percent(arimaMAPE[i], 0.001), sep = ''))
 }
-names(accSetARIMA) <- sectorNames
+names(arimaMAPE) <- sectorNames
 
 size <- size + 1
 if (size == 1) {
-  accuracyMatrix[1,] <- accSetARIMA
+  accuracyMatrix[1,] <- arimaMAPE
   rownames(accuracyMatrix) <- "ARIMA Regression"
 } else {
-  accuracyMatrix <- rbind(accuracyMatrix,accSetARIMA)
+  accuracyMatrix <- rbind(accuracyMatrix, arimaMAPE)
   rownames(accuracyMatrix)[size] <- "ARIMA Regression"
 }
 
