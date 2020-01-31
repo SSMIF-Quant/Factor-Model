@@ -139,6 +139,7 @@ tryCatch(
             }
           }
         }
+        tes = tes[which(!is.na(tes$date)),]
         econData[,i+1] = tes[, 2]
       }
       econData = as.data.frame(econData)
