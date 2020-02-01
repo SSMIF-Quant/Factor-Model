@@ -21,7 +21,7 @@ predictionDatabase[,,3] <- as.matrix(predictedValuesRFMat)
 #  i.e. models with lowest MAPE gets highest weight and vice versa
 # Then apply those weights to the predictions from the three models to come up with the "master prediction"
 #  for each sector across the testing period
-for (i in 1:length(masterPredictions)) {
+for (i in 1:ncol(masterPredictionsMat)) {
   factor <- sum(accuracyMatrix[,i]) / accuracyMatrix[,i]
   accWeight <- (factor / sum(factor))
   masterPredictionsMat[,i] <- apply(predictionDatabase[,i,], MARGIN = 1, FUN=function(sectorPrice){accWeight %*% sectorPrice})
