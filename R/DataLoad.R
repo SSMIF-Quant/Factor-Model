@@ -55,15 +55,21 @@ tryCatch(
     opt = c("periodicitySelection" = "DAILY")
 
     # Request SPX index level and write to file
+    # Change this so that if SPX.csv already exists, only update since the last date there
     retrieveSPX = function() {
       write.csv(bdh("SPX Index", c("PX_LAST"), start.date=data.startDate,
                     options = opt), file = "data/SPX.csv", row.names = FALSE)
     }
 
     # Request ratios and yields for each sector and write to corresponding files
+<<<<<<< Updated upstream
+=======
+    
+>>>>>>> Stashed changes
     retrieveValuationData = function() {
-      valuationFields = c("PX_LAST","PE_RATIO", "PX_TO_SALES_RATIO", "FREE_CASH_FLOW_YIELD",
-                          "EST_LTG_EPS_AGGTE","TOT_DEBT_TO_TOT_ASSET","EARN_YLD")
+      valuationFields = c("PX_LAST","PE_RATIO", "PX_TO_BOOK_RATIO", "PX_TO_SALES_RATIO", 
+                          "FREE_CASH_FLOW_YIELD", "EST_LTG_EPS_AGGTE", 
+                          "TOT_DEBT_TO_TOT_ASSET", "EARN_YLD")
       for (i in 1:length(sector.indices)) {
         tes = bdh(sector.indices[i], valuationFields, start.date = data.startDate,
                    options = opt)
@@ -181,15 +187,19 @@ tryCatch(
       colnames(sectors) = c("date", index.names)
 
       res <- emptySectorList
-      cols = c("price", "return", "P/E", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", "Debt/Asset Percentage",
-               "Earnings Yield", "Put/Call Open Interest", "Institution Ownership", "Volume", "Training Set",
-               "Testing Set")
+      cols = c("price", "logPrice", "P/E", "P/B", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", 
+               "Debt/Asset Percentage", "Earnings Yield", "Put/Call Open Interest", 
+               "Institution Ownership", "Volume", "Training Set", "Testing Set")
       for(i in 1:length(sectorNames)) {
         res[[sectorNames[i]]] = vector("list", length=length(cols))
         names(res[[sectorNames[i]]]) = cols
         price = sectors[, index.names[i]] %>% clean(sectors) %>% numerify
         res[[sectorNames[i]]][["price"]] = price
+<<<<<<< Updated upstream
         res[[sectorNames[i]]][["return"]] = cumReturn(price)
+=======
+        res[[sectorNames[i]]][["logPrice"]] = log(price)
+>>>>>>> Stashed changes
       }
       return(res)
     }
