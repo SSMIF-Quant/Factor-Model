@@ -30,7 +30,7 @@ colnames(masterPredictionsMat) <- sectorNames
 masterPredictionsMat = as.xts(masterPredictionsMat, order.by = index(sectorPrices$IT$`Testing Set`))
 
 overallMAPE <- sapply(1:ncol(masterPredictionsMat), FUN=function(i) {
-  mean(abs((masterPredictionsMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+  mean(abs((masterPredictionsMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
 })
 for (i in 1:length(overallMAPE)) {
   print(paste(sectorNames[i], " MAPE: ", percent(overallMAPE[i], 0.001), sep = ''))
@@ -133,10 +133,10 @@ score = function(w) {
   # (0.85 * abs()) + (0.05 * Excess Vol) + (0.05 * VaR) + (0.05 * CVaR)
   a = c(0.05, 0.85, 0.05, 0.05)
   u = 0.1
-  #p = portfolio_builder(masterPredictionsMat, w)
-  p = portfolio_builder(sectorPriceMatTest, w) # *** THIS USES ACTUAL SECTOR LEVELS, NOT MODEL PREDICTIONS ***
+  p = portfolio_builder(masterPredictionsMat, w)
+  #p = portfolio_builder(sectorPriceMatTest, w) # *** THIS USES ACTUAL SECTOR LEVELS, NOT MODEL PREDICTIONS ***
   
-  vol = abs((w %*% covMat %*% w) - (1 - u) * (sd(SPX_dailyRet_test)^2))
+  vol = abs((1 - u) * (w %*% covMat %*% w) - (sd(SPX_dailyRet_test)^2))
   ret = cumReturn(p)[nrow(masterPredictionsMat),1] - SPX_cumulRet_test[length(SPX_cumulRet_test)]
   var = VaR(p, 0.95) - VaR(SPX_test, 0.95)
   cvar = CVaR(p, 0.95) - CVaR(SPX_test, 0.95)

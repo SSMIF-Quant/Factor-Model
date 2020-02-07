@@ -2,7 +2,7 @@ linear_models <- emptySectorList
 
 for (i in 1:length(sectorPrices)) {
   sectDat <- sectorPrices[[i]][["Training Set"]]
-  form <- paste(colnames(sectDat)[1]," ~ ",colnames(sectDat)[3],sep='')
+  form <- paste(colnames(sectDat)[2]," ~ ",colnames(sectDat)[3],sep='')
   for (j in colnames(sectDat)[4:ncol(sectDat)]) {
     if (j == "EPSGrowthRate" || j == "EPS.Growth.Rate" || j == "PutCallOpenInterest" || j == "InstitutionOwnership") {
       next()
@@ -87,7 +87,7 @@ names(predictedValuesLinear) <- sectorNames
 colnames(predictedValuesLinearMat) <- names(predictedValuesLinear)
 
 linearMAPE <- sapply(1:ncol(predictedValuesLinearMat), FUN=function(i) {
-  mean(abs((predictedValuesLinearMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+  mean(abs((predictedValuesLinearMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
 })
 for (i in 1:length(linearMAPE)) {
   print(paste(sectorNames[i], " MAPE: ", percent(linearMAPE[i], 0.001), sep = ''))

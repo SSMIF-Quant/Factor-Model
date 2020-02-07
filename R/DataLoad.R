@@ -61,6 +61,8 @@ tryCatch(
     }
 
     # Request ratios and yields for each sector and write to corresponding files
+    
+    ## ADD PX_TO_BOOK RATIO
     retrieveValuationData = function() {
       valuationFields = c("PX_LAST","PE_RATIO", "PX_TO_SALES_RATIO", "FREE_CASH_FLOW_YIELD",
                           "EST_LTG_EPS_AGGTE","TOT_DEBT_TO_TOT_ASSET","EARN_YLD")
@@ -189,7 +191,7 @@ tryCatch(
         names(res[[sectorNames[i]]]) = cols
         price = sectors[, index.names[i]] %>% clean(sectors) %>% numerify
         res[[sectorNames[i]]][["price"]] = price
-        res[[sectorNames[i]]][["return"]] = cumReturn(price)
+        res[[sectorNames[i]]][["return"]] = log(price)
       }
       return(res)
     }
