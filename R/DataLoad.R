@@ -62,13 +62,9 @@ tryCatch(
     }
 
     # Request ratios and yields for each sector and write to corresponding files
-<<<<<<< Updated upstream
-=======
-    
->>>>>>> Stashed changes
     retrieveValuationData = function() {
-      valuationFields = c("PX_LAST","PE_RATIO", "PX_TO_BOOK_RATIO", "PX_TO_SALES_RATIO", 
-                          "FREE_CASH_FLOW_YIELD", "EST_LTG_EPS_AGGTE", 
+      valuationFields = c("PX_LAST","PE_RATIO", "PX_TO_BOOK_RATIO", "PX_TO_SALES_RATIO",
+                          "FREE_CASH_FLOW_YIELD", "EST_LTG_EPS_AGGTE",
                           "TOT_DEBT_TO_TOT_ASSET", "EARN_YLD")
       for (i in 1:length(sector.indices)) {
         tes = bdh(sector.indices[i], valuationFields, start.date = data.startDate,
@@ -84,14 +80,14 @@ tryCatch(
     retrieveSentimentData = function() {
       sectorETFs = c("XLK US Equity", "XLF US Equity", "XLE US Equity",
                      "XLV US Equity", "XLP US Equity", "XLY US Equity",
-                     "XLI US Equity", "XLU US Equity", "XLC US Equity", 
+                     "XLI US Equity", "XLU US Equity", "XLC US Equity",
                      "XLB US Equity")
       sentimentFields = c("PX_LAST","PUT_CALL_OPEN_INTEREST_RATIO","EQY_INST_PCT_SH_OUT","PX_VOLUME")
       for (i in 1:length(sectorETFs)) {
         # Use sector ETFs to get sentiment fields
         tes = bdh(sectorETFs[i], sentimentFields, start.date = data.startDate,
                   options = opt, int.as.double = TRUE, include.non.trading.days = TRUE)
-        
+
         # Institution Ownership only has data on Sundays, so fill in Sunday's value for the next week
         non_zeroes <- which(tes$EQY_INST_PCT_SH_OUT > 0)
         for (j in 1:length(non_zeroes)) {
@@ -106,7 +102,7 @@ tryCatch(
             tes[k, "EQY_INST_PCT_SH_OUT"] = tes[non_zeroes[j], "EQY_INST_PCT_SH_OUT"]
           }
         }
-        
+
         # Then query for the actual index level for those same dates
         sectorPrice = bdh(sector.indices[i], c("PX_LAST"), start.date = data.startDate,
                           options = opt, int.as.double = TRUE, include.non.trading.days = TRUE)
@@ -154,7 +150,7 @@ tryCatch(
       econData = econData[-which(as.Date(econData$date) %in% getHolidays(tes)),] # remove holidays
       write.csv(econData, file = "data/economic/econData.csv", row.names = FALSE)
     }
-    
+
     # Merge all sector levels together and write to a file
     writeSectorData = function() {
       for (i in 1:length(index.names)) {
@@ -187,19 +183,15 @@ tryCatch(
       colnames(sectors) = c("date", index.names)
 
       res <- emptySectorList
-      cols = c("price", "logPrice", "P/E", "P/B", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", 
-               "Debt/Asset Percentage", "Earnings Yield", "Put/Call Open Interest", 
-               "Institution Ownership", "Volume", "Training Set", "Testing Set")
+      cols = c("price", "logPrice", "P/E", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", "Debt/Asset Percentage",
+               "Earnings Yield", "Put/Call Open Interest", "Institution Ownership", "Volume", "Training Set",
+               "Testing Set")
       for(i in 1:length(sectorNames)) {
         res[[sectorNames[i]]] = vector("list", length=length(cols))
         names(res[[sectorNames[i]]]) = cols
         price = sectors[, index.names[i]] %>% clean(sectors) %>% numerify
         res[[sectorNames[i]]][["price"]] = price
-<<<<<<< Updated upstream
-        res[[sectorNames[i]]][["return"]] = cumReturn(price)
-=======
         res[[sectorNames[i]]][["logPrice"]] = log(price)
->>>>>>> Stashed changes
       }
       return(res)
     }
@@ -226,7 +218,7 @@ tryCatch(
       for (i in 1:length(index.names)) {
         value = read.csv(paste("data/valuation/", index.names[i], " Value Data.csv", sep = ""))
         sentiment = read.csv(paste("data/sentiment/", index.names[i], " Sentiment Data.csv", sep = ""))
-        
+
         # Institution Ownership only has data on Sundays, so fill in Sunday's value for the next week
         non_zeroes <- which(sentiment$EQY_INST_PCT_SH_OUT > 0)
         for (j in 1:length(non_zeroes)) {
@@ -241,7 +233,7 @@ tryCatch(
             sentiment[k, "EQY_INST_PCT_SH_OUT"] = sentiment[non_zeroes[j], "EQY_INST_PCT_SH_OUT"]
           }
         }
-        
+
         # Merge the sentiment data with valuation metrics
         value = merge(value, sentiment[,-2], by="date")
 

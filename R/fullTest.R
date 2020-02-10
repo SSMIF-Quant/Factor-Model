@@ -90,8 +90,7 @@ ymaxTest = ceiling(max(totalReturnComparisonTest*10))*10
     scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0))
 gt2 = ggplotGrob(returnsGraphTest)
-gt2$layout$clip[gt2$layout$name == "panel"] = "off"
-grid::grid.draw(gt2)}
+gt2$layout$clip[gt2$layout$name == "panel"] = "off"}
 cowplot::save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid::grid.draw(gt2), base_width=6, base_height=3)
 
 
@@ -120,14 +119,30 @@ cowplot::save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(
 {sectorPricesdf = read.csv(paste("data/sectors.csv"), col.names=c("date", sectorNames))
 sectorPricesdf[,2:11] = returnCalculation(sectorPricesdf[,2:11])
 sectorPricesdf = melt(sectorPricesdf, id.vars="date", variable.name="sector", value.name="return")
-(sectorReturns <- ggplot(sectorPricesdf) + 
+sectorReturns <- ggplot(sectorPricesdf) + 
     geom_rect(data = recessionDatesdf, aes(xmin=xmin,xmax=xmax,ymin=-.8,ymax=3.5), fill="darkgrey", alpha=0.5) + 
     geom_line(aes(x=as.Date(date), y=return, color=sector, group=sector), size=0.1) +
     scale_color_manual("", breaks = sectorPricesdf$sector, values=c(rainbow(6, start=0.9), distinctColorPalette(k=4))) +
     labs(title="Sector Returns") + xlab("Year") + ylab("Return") +
     scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0)))}
+    scale_y_continuous(expand = c(0,0))}
 ggsave(file.path(savePath, "sectorReturns.png"), plot=sectorReturns, width=8, height=3, units="in")
+
+
+# Plot predicted returns versus actual per sector
+{colnames(sectorPriceMatTest) = sectorNames
+actualDF = melt(cbind(Date=index(sectorPriceMatTest), as.data.frame(apply(sectorPriceMatTest, 2, cumReturn))), 
+                measure.vars = sectorNames, variable.name="sector", value.name = "CumulativeReturn")
+actualDF$Type = "Actual"
+predDF = melt(cbind(Date=index(masterPredictionsMat), as.data.frame(apply(exp(masterPredictionsMat), 2, cumReturn))), 
+              measure.vars = sectorNames, variable.name="sector", value.name = "CumulativeReturn")
+predDF$Type = "Pred"
+(modelAssessment <- ggplot(data=rbind(actualDF, predDF)) +
+  geom_line(aes(x=Date, y=CumulativeReturn, color=Type), size=0.3) + 
+  facet_wrap(~sector, nrow = 2) +
+  labs(title="Model Predictions vs. Actual Sector Levels (2011-Present)", ylab="Cumulative Return (%)") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("3 years"), expand = c(0,0)))}
+ggsave(file.path(savePath, "modelAssessment.png"), plot=modelAssessment, width=8, height=4, units="in")
 
 
 # Save weights into CSV file (date run, date of data, and weights)
@@ -140,5 +155,5 @@ if(!file.exists(historyPath)) {
   colnames(headers) = cols
   write.csv(headers, historyFile, row.names = F)
 }
-currentRun = t(as.matrix(c(as.character(Sys.Date()), as.character(as.Date(file.mtime("data/SPX.csv"))), weightsVector)))
+currentRun = t(as.matrix(c(as.character(Sys.Date()), as.character(as.Date(file.info("data/SPX.csv")$ctime)), weightsVector)))
 write.table(currentRun, file=historyPath, append = T, sep=",", row.names=F, col.names=F)

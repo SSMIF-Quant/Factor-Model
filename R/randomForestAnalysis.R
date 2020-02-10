@@ -4,7 +4,6 @@ for (i in 1:length(randomForest_models)) {
   train_mat <- sectorPrices[[i]][["Training Set"]]
   randomForest_models[[i]] <- randomForest(as.formula(form),
                                            data = train_mat,
-                                           ytest = train_mat[,1],
                                            ntree = 500,
                                            na.action = na.omit)
 }
@@ -14,7 +13,7 @@ predictedValuesRF <- emptySectorList
 predictedValuesRFMat <- matrix(ncol = length(predictedValuesRF),nrow = nrow(predictedValuesLinearMat))
 
 for (i in 1:length(predictedValuesARIMA)) {
-  predict_mat <- sectorPrices[[i]][["Testing Set"]][,-1]
+  predict_mat <- sectorPrices[[i]][["Testing Set"]]
   preds <- predict(randomForest_models[[i]],newdata = predict_mat)
   predictedValuesRF[[i]] <- preds
   predictedValuesRFMat[,i] <- preds
@@ -22,7 +21,7 @@ for (i in 1:length(predictedValuesARIMA)) {
 names(predictedValuesRF) <- colnames(predictedValuesRFMat) <- sectorNames
 
 forestMAPE <- sapply(1:ncol(predictedValuesRFMat), FUN=function(i) {
-  mean(abs((predictedValuesRFMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+  mean(abs((predictedValuesRFMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
 })
 for (i in 1:length(forestMAPE)) {
   print(paste(sectorNames[i], " MAPE: ", percent(forestMAPE[i], 0.001), sep = ''))

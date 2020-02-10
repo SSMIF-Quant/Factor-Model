@@ -17,7 +17,7 @@ for (i in 1:length(arima_models)) {
   colnames(regMatrix) <- colN
   regMatrix <- regMatrix[,-which(sapply(as.data.frame(regMatrix), function(x){all(x==0 | is.na(x))}))] #remove cols with all zeroes
   regMatrices[[i]] = regMatrix
-  arima_models[[i]] <- auto.arima(x[,1],xreg = regMatrix)
+  arima_models[[i]] <- auto.arima(x[,2],xreg = regMatrix)
 }
 names(arima_models) <- sectorNames
 
@@ -53,7 +53,7 @@ for (i in 1:length(arima_models)) {
 colnames(predictedValuesARIMAMat) <- names(predictedValuesARIMA) <- sectorNames
 
 arimaMAPE <- sapply(1:ncol(predictedValuesARIMAMat), FUN=function(i) {
-  mean(abs((predictedValuesARIMAMat[,i] - sectorPrices[[i]][["Testing Set"]][,1]) / sectorPrices[[i]][["Testing Set"]][, 1]))
+  mean(abs((predictedValuesARIMAMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
 })
 for (i in 1:length(arimaMAPE)) {
   print(paste(sectorNames[i], " MAPE: ", percent(arimaMAPE[i], 0.001), sep = ''))
