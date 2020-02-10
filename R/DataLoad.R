@@ -183,7 +183,7 @@ tryCatch(
       colnames(sectors) = c("date", index.names)
 
       res <- emptySectorList
-      cols = c("price", "return", "P/E", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", "Debt/Asset Percentage",
+      cols = c("price", "logPrice", "P/E", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", "Debt/Asset Percentage",
                "Earnings Yield", "Put/Call Open Interest", "Institution Ownership", "Volume", "Training Set",
                "Testing Set")
       for(i in 1:length(sectorNames)) {
@@ -191,7 +191,7 @@ tryCatch(
         names(res[[sectorNames[i]]]) = cols
         price = sectors[, index.names[i]] %>% clean(sectors) %>% numerify
         res[[sectorNames[i]]][["price"]] = price
-        res[[sectorNames[i]]][["return"]] = log(price)
+        res[[sectorNames[i]]][["logPrice"]] = log(price)
       }
       return(res)
     }
