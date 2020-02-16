@@ -183,7 +183,7 @@ tryCatch(
       colnames(sectors) = c("date", index.names)
 
       res <- emptySectorList
-      cols = c("price", "logPrice", "P/E", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", "Debt/Asset Percentage",
+      cols = c("price", "logPrice", "P/E", "P/B", "P/S", "FCF Yield", "PEG", "EPS Growth Rate", "Debt/Asset Percentage",
                "Earnings Yield", "Put/Call Open Interest", "Institution Ownership", "Volume", "Training Set",
                "Testing Set")
       for(i in 1:length(sectorNames)) {
@@ -238,10 +238,10 @@ tryCatch(
         value = merge(value, sentiment[,-2], by="date")
 
         for (j in 3:(length(sectorPrices[[i]])-2)) {
-          if (j == 6) { # Calculate PEG (Price / FCF Yield?)
-            signFactor <- as.matrix(sign(value[,2]) * sign(value[,5]))
-            sectorPrices[[i]][[j]] <<- signFactor * log(abs(as.matrix((value[,2]/value[,5]))))
-          } else if (j >= 7) { # EPS Growth, D/A, Earnings Yield, Put/Call, Institution Ownership, and Volume
+          if (j == 7) { # Calculate PEG (Price / FCF Yield?)
+            signFactor <- as.matrix(sign(value[,2]) * sign(value[,6]))
+            sectorPrices[[i]][[j]] <<- signFactor * log(abs(as.matrix((value[,2]/value[,6]))))
+          } else if (j >= 8) { # EPS Growth, D/A, Earnings Yield, Put/Call, Institution Ownership, and Volume
             sectorPrices[[i]][[j]] <<- as.matrix(sign(value[,j-1])) * abs(as.matrix(value[,j-1]))
           } else { # P/E, P/S, FCF Yield
             sectorPrices[[i]][[j]] <<- as.matrix(sign(value[,j])) * abs(as.matrix(value[,j]))

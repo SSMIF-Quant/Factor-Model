@@ -158,7 +158,7 @@ population = cbind(population,NA)
 
 # Start breeding
 currentGen = 1
-totalTime = NULL
+totalTime = 0
 killScores = NULL
 while (currentGen <= generations) {
   s = Sys.time()

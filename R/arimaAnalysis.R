@@ -6,14 +6,14 @@ for (i in 1:length(arima_models)) {
   regMatrix <- matrix(ncol = ncol(x)-2,nrow = nrow(x))
   colN <- NULL
   for (j in 3:ncol(x)) {
-    if (colnames(x)[j] == "EPSGrowthRate" || colnames(x)[j] == "EPS.Growth.Rate") {
+    if (colnames(x)[j] == "EPSGrowthRate" || colnames(x)[j] == "PEG") {
       next()
     } else {
       regMatrix[,j-2] <- sectorPrices[[i]][["Training Set"]][,j]
       colN <- c(colN,colnames(x)[j])
     }
   }
-  regMatrix <- regMatrix[,-5] # Remove the column where EPS Growth Rate was skipped over
+  regMatrix <- regMatrix[,-c(5,6)] # Remove the column where PEG and EPS Growth Rate was skipped over
   colnames(regMatrix) <- colN
   regMatrix <- regMatrix[,-which(sapply(as.data.frame(regMatrix), function(x){all(x==0 | is.na(x))}))] #remove cols with all zeroes
   regMatrices[[i]] = regMatrix

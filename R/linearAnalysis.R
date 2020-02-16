@@ -4,7 +4,7 @@ for (i in 1:length(sectorPrices)) {
   sectDat <- sectorPrices[[i]][["Training Set"]]
   form <- paste(colnames(sectDat)[2]," ~ ",colnames(sectDat)[3],sep='')
   for (j in colnames(sectDat)[4:ncol(sectDat)]) {
-    if (j == "EPSGrowthRate" || j == "EPS.Growth.Rate" || j == "PutCallOpenInterest" || j == "InstitutionOwnership") {
+    if (j == "EPSGrowthRate"|| j == "PutCallOpenInterest" || j == "InstitutionOwnership") {
       next()
     } else {
       form <- paste(form,as.character(j),sep = " + ")
