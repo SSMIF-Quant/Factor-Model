@@ -155,5 +155,5 @@ if(!file.exists(historyPath)) {
   colnames(headers) = cols
   write.csv(headers, historyFile, row.names = F)
 }
-currentRun = t(as.matrix(c(as.character(Sys.Date()), as.character(as.Date(file.info("data/SPX.csv")$ctime)), weightsVector)))
+currentRun = t(as.matrix(c(as.character(Sys.Date()), as.character(as.Date(file.info("data/SPX.csv")$mtime)), weightsVector)))
 write.table(currentRun, file=historyPath, append = T, sep=",", row.names=F, col.names=F)
