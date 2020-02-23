@@ -20,20 +20,20 @@ for (i in 1:length(predictedValuesARIMA)) {
 }
 names(predictedValuesRF) <- colnames(predictedValuesRFMat) <- sectorNames
 
-forestMAPE <- sapply(1:ncol(predictedValuesRFMat), FUN=function(i) {
-  mean(abs((predictedValuesRFMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
+forestError <- sapply(1:ncol(predictedValuesRFMat), FUN=function(i) {
+  sum(log(predictedValuesRFMat[,i] / sectorPrices[[i]][["Testing Set"]][, 2]) ^ 2)
 })
-for (i in 1:length(forestMAPE)) {
-  print(paste(sectorNames[i], " MAPE: ", percent(forestMAPE[i], 0.001), sep = ''))
+for (i in 1:length(forestError)) {
+  print(paste(sectorNames[i], " Total Error: ", round(forestError[i], 4), sep = ''))
 }
-names(forestMAPE) <- sectorNames
+names(forestError) <- sectorNames
 
 size <- size + 1
 if (size == 1) {
-  accuracyMatrix[1,] <- forestMAPE
+  accuracyMatrix[1,] <- forestError
   rownames(accuracyMatrix) <- "Random Forest"
 } else {
-  accuracyMatrix <- rbind(accuracyMatrix, forestMAPE)
+  accuracyMatrix <- rbind(accuracyMatrix, forestError)
   rownames(accuracyMatrix)[size] <- "Random Forest"
 }
 

@@ -29,13 +29,13 @@ for (i in 1:ncol(masterPredictionsMat)) {
 colnames(masterPredictionsMat) <- sectorNames
 masterPredictionsMat = as.xts(masterPredictionsMat, order.by = index(sectorPrices$IT$`Testing Set`))
 
-overallMAPE <- sapply(1:ncol(masterPredictionsMat), FUN=function(i) {
-  mean(abs((masterPredictionsMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
+overallError <- sapply(1:ncol(masterPredictionsMat), FUN=function(i) {
+  sum(log(masterPredictionsMat[,i] / sectorPrices[[i]][["Testing Set"]][, 2]) ^ 2)
 })
-for (i in 1:length(overallMAPE)) {
-  print(paste(sectorNames[i], " MAPE: ", percent(overallMAPE[i], 0.001), sep = ''))
+for (i in 1:length(overallError)) {
+  print(paste(sectorNames[i], " Total Error: ", round(overallError[i], 4), sep = ''))
 }
-names(overallMAPE) <- sectorNames
+names(overallError) <- sectorNames
 
 covMat = cov((masterPredictionsMat/data.table::shift(masterPredictionsMat,1))[-1,])
 

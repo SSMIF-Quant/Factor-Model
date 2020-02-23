@@ -52,20 +52,20 @@ for (i in 1:length(arima_models)) {
 }
 colnames(predictedValuesARIMAMat) <- names(predictedValuesARIMA) <- sectorNames
 
-arimaMAPE <- sapply(1:ncol(predictedValuesARIMAMat), FUN=function(i) {
-  mean(abs((predictedValuesARIMAMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
+arimaError <- sapply(1:ncol(predictedValuesARIMAMat), FUN=function(i) {
+  sum(log(c(predictedValuesARIMAMat[,i]) / sectorPrices[[i]][["Testing Set"]][, 2]) ^ 2)
 })
-for (i in 1:length(arimaMAPE)) {
-  print(paste(sectorNames[i], " MAPE: ", percent(arimaMAPE[i], 0.001), sep = ''))
+for (i in 1:length(arimaError)) {
+  print(paste(sectorNames[i], " Total Error: ", round(arimaError[i], 4), sep = ''))
 }
-names(arimaMAPE) <- sectorNames
+names(arimaError) <- sectorNames
 
 size <- size + 1
 if (size == 1) {
-  accuracyMatrix[1,] <- arimaMAPE
+  accuracyMatrix[1,] <- arimaError
   rownames(accuracyMatrix) <- "ARIMA Regression"
 } else {
-  accuracyMatrix <- rbind(accuracyMatrix, arimaMAPE)
+  accuracyMatrix <- rbind(accuracyMatrix, arimaError)
   rownames(accuracyMatrix)[size] <- "ARIMA Regression"
 }
 

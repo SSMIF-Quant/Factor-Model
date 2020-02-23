@@ -86,29 +86,29 @@ for (i in 1:length(linear_models)) {
 names(predictedValuesLinear) <- sectorNames
 colnames(predictedValuesLinearMat) <- names(predictedValuesLinear)
 
-linearMAPE <- sapply(1:ncol(predictedValuesLinearMat), FUN=function(i) {
-  mean(abs((predictedValuesLinearMat[,i] - sectorPrices[[i]][["Testing Set"]][,2]) / sectorPrices[[i]][["Testing Set"]][, 2]))
+linearError <- sapply(1:ncol(predictedValuesLinearMat), FUN=function(i) {
+  sum(log(predictedValuesLinearMat[,i] / sectorPrices[[i]][["Testing Set"]][,2]) ^ 2)
 })
-for (i in 1:length(linearMAPE)) {
-  print(paste(sectorNames[i], " MAPE: ", percent(linearMAPE[i], 0.001), sep = ''))
+for (i in 1:length(linearError)) {
+  print(paste(sectorNames[i], " Total Error: ", round(linearError[i], 4), sep = ''))
 }
-names(linearMAPE) <- sectorNames
+names(linearError) <- sectorNames
 
-plotAccLinear <- function() {
-  tmp <- linearMAPE
+plotErrLinear <- function() {
+  tmp <- linearError
   tmp <- cbind(names(tmp),as.data.frame(tmp))
-  colnames(tmp) <- c("Sectors", "Accuracy")
-  rSquareGGPlot <<- 'ggplot(tmp, aes(x=Sectors,y=Accuracy)) + geom_bar(stat = "identity") + geom_text(aes(label = round(Accuracy,digits = 4)),nudge_y=.02) + labs(title = "Accuracy, Linear Model (New)")'
-  eval(parse(text = rSquareGGPlot))
+  colnames(tmp) <- c("Sectors", "Error")
+  errPlot <<- 'ggplot(tmp, aes(x=Sectors,y=Error)) + geom_bar(stat = "identity") + geom_text(aes(label = percent(linearError, 0.001)),nudge_y=.02) + labs(title = "Mean Error, Linear Model")'
+  eval(parse(text = errPlot))
 }
-plotAccLinear()
+plotErrLinear()
 
 size <- size + 1
 if (size == 1) {
-  accuracyMatrix[1,] <- linearMAPE
+  accuracyMatrix[1,] <- linearError
   rownames(accuracyMatrix) <- "Linear Regression"
 } else {
-  accuracyMatrix <- rbind(accuracyMatrix, linearMAPE)
+  accuracyMatrix <- rbind(accuracyMatrix, linearError)
   rownames(accuracyMatrix)[size] <- "Linear Regression"
 }
 
