@@ -1,5 +1,5 @@
 # Define common variables and helper functions
-data.startDate <- as.Date("1/31/1990", format = "%m/%d/%Y")
+data.startDate <- as.Date("1990-01-31")
 sectorNames <- c("IT","FIN","ENG","HLTH","CONS","COND","INDU","UTIL","TELS","MATR")
 emptySectorList = vector("list", length = length(sectorNames))
 names(emptySectorList) = sectorNames
@@ -218,21 +218,6 @@ tryCatch(
       for (i in 1:length(index.names)) {
         value = read.csv(paste("data/valuation/", index.names[i], " Value Data.csv", sep = ""))
         sentiment = read.csv(paste("data/sentiment/", index.names[i], " Sentiment Data.csv", sep = ""))
-
-        # Institution Ownership only has data on Sundays, so fill in Sunday's value for the next week
-        non_zeroes <- which(sentiment$EQY_INST_PCT_SH_OUT > 0)
-        for (j in 1:length(non_zeroes)) {
-          # Find how far down to go once we find a value
-          if(j == length(non_zeroes)) {
-            range = (non_zeroes[j]+1):nrow(sentiment)
-          } else {
-            range = (non_zeroes[j]+1):(non_zeroes[j+1]-1)
-          }
-          # Then fill in that range
-          for(k in range) {
-            sentiment[k, "EQY_INST_PCT_SH_OUT"] = sentiment[non_zeroes[j], "EQY_INST_PCT_SH_OUT"]
-          }
-        }
 
         # Merge the sentiment data with valuation metrics
         value = merge(value, sentiment[,-2], by="date")

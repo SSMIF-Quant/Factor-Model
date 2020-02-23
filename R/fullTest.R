@@ -14,9 +14,9 @@ weights_plot <- ggplot(weights_df[weights_df$weights > 0,], aes(x="", y=weights,
   coord_polar("y") + 
   theme_void() + 
   theme(legend.position = "none") +
-  scale_fill_manual(values=RColorBrewer::brewer.pal(10, "Set3")) +
+  scale_fill_manual(values=brewer.pal(10, "Set3")) +
   geom_text(aes(y = weights, label = paste(sectors, ": ", percent(weights), sep="")), position = position_stack(vjust = 0.5))
-cowplot::save_plot(file.path(savePath, "weights.png"), plot=weights_plot, base_width=4, base_height=4)
+save_plot(file.path(savePath, "weights.png"), plot=weights_plot, base_width=4, base_height=4)
 
 
 SPX_all = as.xts(exp(spx[[1]]), order.by = as.Date(rownames(spx[[1]])))
@@ -69,7 +69,7 @@ recessionDatesdf = data.frame(xmin=c(as.Date("1990-07-02"), as.Date("2001-03-01"
 gt = ggplotGrob(returnsGraph)
 gt$layout$clip[gt$layout$name == "panel"] = "off"
 grid::grid.draw(gt)}
-cowplot::save_plot(file.path(savePath, "cumulativeReturns.png"), plot=grid::grid.draw(gt), base_width=8, base_height=3)
+save_plot(file.path(savePath, "cumulativeReturns.png"), plot=grid::grid.draw(gt), base_width=8, base_height=3)
 
 
 # Relative Cumulative Returns (Testing Period)
@@ -91,7 +91,7 @@ ymaxTest = ceiling(max(totalReturnComparisonTest*10))*10
     scale_y_continuous(expand = c(0,0))
 gt2 = ggplotGrob(returnsGraphTest)
 gt2$layout$clip[gt2$layout$name == "panel"] = "off"}
-cowplot::save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid::grid.draw(gt2), base_width=6, base_height=3)
+save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid::grid.draw(gt2), base_width=6, base_height=3)
 
 
 # Recession Stress Test (% Return of Portfolio vs SPX)
@@ -112,7 +112,7 @@ port_metrics = c("1990-2020", percent(port_cumulRet), percent(port_sd), round(po
 spx_metrics = c("1990-2020", percent(mkt_ret), percent(mkt_sd), round(mkt_ret/mkt_sd, 2),
                 percent(VaR(SPX_all, 0.95)), percent(CVaR(SPX_all, 0.95)), percent(unname(recessionTest[2,])))
 stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
-cowplot::save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
+save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
 
 
 # Plot each sector's returns
