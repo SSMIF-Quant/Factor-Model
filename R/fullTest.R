@@ -107,10 +107,10 @@ recessionTest*100
 
 # Put stats into dataframe and save image of it
 metrics = c("Period", "Return", "Risk", "Sharpe", "Daily 95% VaR", "Daily 95% CVaR", "1990 Recession", "2001 Recession", "2008 Recession")
-port_metrics = c("1990-2020", percent(port_cumulRet), percent(port_sd), round(port_cumulRet/port_sd, 2),
-                 percent(VaR(port, 0.95)), percent(CVaR(port, 0.95)), percent(unname(recessionTest[1,])))
-spx_metrics = c("1990-2020", percent(mkt_ret), percent(mkt_sd), round(mkt_ret/mkt_sd, 2),
-                percent(VaR(SPX_all, 0.95)), percent(CVaR(SPX_all, 0.95)), percent(unname(recessionTest[2,])))
+port_metrics = c("1990-2020", percent(port_cumulRet, 0.01), percent(port_sd, 0.01), round(port_cumulRet/port_sd, 2),
+                 percent(VaR(port, 0.95), 0.01), percent(CVaR(port, 0.95), 0.01), percent(unname(recessionTest[1,]), 0.01))
+spx_metrics = c("1990-2020", percent(mkt_ret, 0.01), percent(mkt_sd, 0.01), round(mkt_ret/mkt_sd, 2),
+                percent(VaR(SPX_all, 0.95), 0.01), percent(CVaR(SPX_all, 0.95), 0.01), percent(unname(recessionTest[2,]), 0.01))
 stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
 save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
 
