@@ -148,7 +148,7 @@ score = function(w) {
 population = NULL
 i<-1
 while (i <= population_size) {
-  w = sample(seq(minWeight, maxWeight, 0.001), 10)
+  w = sample(seq(minWeight, maxWeight, 0.01), 10)
   if (sum(w) == 1) {
     population = rbind(population, w)
     i = i + 1
