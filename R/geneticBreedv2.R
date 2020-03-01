@@ -3,6 +3,7 @@ SPX_test = exp(as.xts(spx[[1]]))
 SPX_test = SPX_test[index(SPX_test) >= index(sectorPrices$IT$`Testing Set`)[1],]
 SPX_dailyRet_test = na.omit(diff(log(SPX_test)))
 SPX_cumulRet_test = log(as.numeric(SPX_test) / as.numeric(SPX_test[1]))
+SPX_vol_test = sd(SPX_dailyRet_test)^2
 # Load in Sector Index levels for testing period
 sectorPriceMat = read.csv(paste("data/sectors.csv"))
 sectorPriceMat = as.xts(sectorPriceMat[,-1], order.by = as.Date(sectorPriceMat$date))
@@ -58,6 +59,8 @@ CVaR = function(prices, pct) {
   under_var = sort(as.numeric(returns))[1:(round(nrow(returns) * (1 - pct)))]
   mean(under_var)
 }
+SPX_var_test = VaR(SPX_test, 0.95)
+SPX_cvar_test = CVaR(SPX_test, 0.95)
 
 
 breeding <- function(p1,p2) {
@@ -136,10 +139,10 @@ score = function(w) {
   p = portfolio_builder(masterPredictionsMat, w)
   #p = portfolio_builder(sectorPriceMatTest, w) # *** THIS USES ACTUAL SECTOR LEVELS, NOT MODEL PREDICTIONS ***
   
-  vol = abs((1 - u) * (w %*% covMat %*% w) - (sd(SPX_dailyRet_test)^2))
+  vol = abs((1 - u) * (w %*% covMat %*% w) - SPX_vol_test)
   ret = cumReturn(p)[nrow(masterPredictionsMat),1] - SPX_cumulRet_test[length(SPX_cumulRet_test)]
-  var = VaR(p, 0.95) - VaR(SPX_test, 0.95)
-  cvar = CVaR(p, 0.95) - CVaR(SPX_test, 0.95)
+  var = VaR(p, 0.95) - SPX_var_test
+  cvar = CVaR(p, 0.95) - SPX_cvar_test
   
   (-a[1] * vol) + (a[2] * ret) + (a[3] * var) + (a[4] * cvar)
 }
