@@ -129,7 +129,7 @@ For reference, the previous optimization method used to find the best weights wa
 
 2. **Scoring:** In each generation, the first thing we do is score each set of weights by plugging them into our objective function. This process alone takes more time than everything else in the factor model combined, as it involves taking a set of weights, building the portfolio and then calculating the return, risk, VaR and CVaR, the last two of which are the most intensive. Although each call to `score()` takes only 0.12-0.15 seconds, doing so 6,000 times in each generation adds up. 
 
-3. **Killing:** The way these weights are optimized is by "killing" off the least performing ones, and thus breeding children from only the best weights in each generation. The current survival rate is 1/3, so we find the score in the 67th percentile of the entire population, and any set of weights with a score less than that threshold is set to null (i.e. killed off). We keep track of these "kill scores" and plot them at the end just to confirm that with each generation, the threshold rises, meaning we are getting better and better weights:
+3. **Killing:** The way these weights are optimized is by "killing" off the least performing ones, and thus breeding children from only the best weights in each generation. The current survival rate is 1/3, so we find the score in the 67th percentile of the entire population, and any set of weights with a score less than that threshold is set to null (i.e. killed off). We keep track of these "kill scores" and plot them at the end just to confirm that with each generation, the threshold rises, meaning we are getting better weights each iteration:
 
 ![Plot of score thresholds for each generation](https://i.imgur.com/ehjRuDA.png)
 
