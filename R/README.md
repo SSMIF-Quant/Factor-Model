@@ -32,46 +32,28 @@ Once the data for each factor category is cleaned and processed, it is all writt
 
 #### Loading Locally-Saved Data
 
-Regardless of whether or not you're on a Bloomberg Terminal, the data is loaded from the saved files for preparation to use in the models. Most of the heavy lifting here has to do with making sure the data is formatted so it can be merged properly, as well as calculating some of the derived factors, such as PEG (or what is supposed to be PEG, the factor model when I first started working on it actually calculates this as $\frac{Price}{FCF\; Yield}$. We tried fixing this so it finds $PEG=\frac{P/E\; ratio}{EPS\; growth\; rate}$, but the model results became far less accurate, so it was kept as $\frac{Price}{FCF\; Yield}$). Finally, once the valuation, sentiment, and macroeconomic data are all merged for each sector, it is split up in a roughly 70/30 split into training and testing data, and then we are ready to move onto modelling.
+Regardless of whether or not you're on a Bloomberg Terminal, the data is loaded from the saved files for preparation to use in the models. Most of the heavy lifting here has to do with making sure the data is formatted so it can be merged properly, as well as calculating some of the derived factors, such as PEG (or what is supposed to be PEG, the factor model when I first started working on it actually calculates this as ![price to fcf yield](http://www.sciweavers.org/upload/Tex2Img_1583094161/eqn.png). We tried fixing this so it finds ![peg formula](http://www.sciweavers.org/upload/Tex2Img_1583094106/eqn.png), but the model results became far less accurate, so it was kept as ![price to fcf yield](http://www.sciweavers.org/upload/Tex2Img_1583094161/eqn.png)). Finally, once the valuation, sentiment, and macroeconomic data are all merged for each sector, it is split up in a roughly 70/30 split into training and testing data, and then we are ready to move onto modelling.
 
 
 ### Modelling
 
 **_Relevant files:_** `linearAnalysis.R`, `arimaAnalysis.R`, `randomForestAnalysis.R`
 
-The actual modelling that we do is split across three different methods: a linear regression, an ARIMA time series model, as well as a random forest regression. The methodology for each of these is pretty standard: each model is fitted using the training data, predictions are generated across the domain of the testing period, then we measure error between the model predictions and actual values of each sector index. The error measure was recently changed to the log of the accuracy ratio --- $log(\frac{prediction}{actual})$. Previously, we had used mean absolute percentage error, but after some research, we found MAPE was a biased metric in that [it would favor models with predictions that are systematically too low](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2635088), leading to using the symmetric log-based measure.
+The actual modelling that we do is split across three different methods: a linear regression, an ARIMA time series model, as well as a random forest regression. The methodology for each of these is pretty standard: each model is fitted using the training data, predictions are generated across the domain of the testing period, then we measure error between the model predictions and actual values of each sector index. The error measure was recently changed to the log of the accuracy ratio --- ![log error](http://www.sciweavers.org/upload/Tex2Img_1583094222/eqn.png). Previously, we had used mean absolute percentage error, but after some research, we found MAPE was a biased metric in that [it would favor models with predictions that are systematically too low](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2635088), leading to using the symmetric log-based measure.
 
 #### Linear Regression
 
 The model we construct and regressors used are consistent across every sector, and used in both the linear regression and later on for the random forest regression. Currently, the linear and random forest models are constructed as follows:
 
-$$log(Price) = \beta^T
-\begin{pmatrix}
-PE \\
-PB \\
-PS \\
-FCF\;Yield \\
-PEG \\
-Debt/Asset\; \% \\
-Earnings\; Yield \\
-Volume \\
-GDP\; Growth \\
-2y\; Treasury\; Yield \\
-10y\; Treasury\; Yield \\
-Unemployment\; Rate \\
-LFPR \\
-Consumer\; Sentiment \\
-Inflation
-\end{pmatrix}
-$$
+![model construction](http://www.sciweavers.org/upload/Tex2Img_1583094253/eqn.png)
 
-where $\beta$ is the vector of coefficients that are generated when the model is fitted for each sector. The ARIMA models are similar, with additional terms $\phi_0+\sum_{i=1}^{p}{\phi_i log(Price)_{t-i}+\epsilon_t}$ and $\mu+\epsilon_t+\sum_{i=1}^{q}{\theta_t\epsilon_{t-i}}$ to capture the AR and MA movement, respectively.
+where ![beta](http://www.sciweavers.org/upload/Tex2Img_1583094410/eqn.png) is the vector of coefficients that are generated when the model is fitted for each sector. The ARIMA models are similar, with additional terms ![ar terms](http://www.sciweavers.org/upload/Tex2Img_1583094442/eqn.png) and ![ma terms](http://www.sciweavers.org/upload/Tex2Img_1583094469/eqn.png) to capture the AR and MA movement, respectively.
 
 Once the models are all fitted using the training data, we generate the predictions for each model so that we can measure the error of each, and ultimately optimize how those predictions are blended together. The loss function that we use as a measure of error is as follows:
 
-$$Error = \sum_{i=1}^{N} ln(\frac{Predicted\; Price}{Actual\; Price})^2$$
+![error calculation](http://www.sciweavers.org/upload/Tex2Img_1583094489/eqn.png)
 
-For reference, the calculated errors per sector per model (as of February 29, 2020) is as follows:
+For reference, the calculated errors per sector per model (as of February 28, 2020) is as follows:
 
 |          |   LIN  |  ARIMA |    RF   | Overall |
 |:--------:|:------:|:------:|:-------:|---------|
@@ -91,41 +73,12 @@ For reference, the calculated errors per sector per model (as of February 29, 20
 Since we use three modelling methods, we have to combine the predictions made by each into a master set of predictions over the testing period, which will ultimately be used in the optimization method. Since we measure error for each model, we want to give more weight to the model whose predictions have lower errors than those with higher errors.
 
 To do so, we implement an inverse weighted average method that does exactly this by calculating the inverse percentage of each model's error across all the models for that sector, then dividing each of those "factors" by the sum of all factors for that sector. Using an example (COND) makes this concept easier to understand:
-$$
-Factor=\begin{pmatrix}
-\frac{0.3226+0.5113+42.3518}{0.3226} \\
-\\
-\frac{0.3226+0.5113+42.3518}{0.5113} \\
-\\
-\frac{0.3226+0.5113+42.3518}{42.3518}
-\end{pmatrix} =
-\begin{pmatrix}
-133.86764  \\
-84.46255 \\
-1.01969
-\end{pmatrix}
-$$
 
-$$
-Weight=\begin{pmatrix}
-\frac{133.86764}{133.86764+84.46255+1.01969} \\
-\\
-\frac{84.46255}{133.86764+84.46255+1.01969} \\
-\\
-\frac{1.01969}{133.86764+84.46255+1.01969}
-\end{pmatrix}=
-\begin{pmatrix}
-0.6103  \\
-0.3851 \\
-0.0046
-\end{pmatrix}
-$$
+![error factors](http://www.sciweavers.org/upload/Tex2Img_1583094510/eqn.png)
 
-$$
-Overall\;Error=\begin{pmatrix}0.3226 & 0.5113 & 42.3518\end{pmatrix}
-\begin{pmatrix}0.6103 \\ 0.3851 \\ 0.0046\end{pmatrix}
-= 0.0648
-$$
+![error weights](http://www.sciweavers.org/upload/Tex2Img_1583094534/eqn.png)
+
+![overall error](http://www.sciweavers.org/upload/Tex2Img_1583094563/eqn.png)
 
 As expected, the random forest model, which has an astronomically high error compared to the linear regression and ARIMA analysis, gets almost zero weight while the lowest error from the linear regression gets over 60% weight towards the overall error and the predictions.
 
@@ -149,7 +102,7 @@ Using the February 28th data again, these are the factors, model weights, and ov
 
 To help keep track of how these models are performing, and to make it easier to interpret model performance, we created a graphic that illustrates the cumulative return of each sector during the testing period as predicted by the models versus the actual return:
 
-![Illustrative model performance](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/modelAssessment.png)
+![Illustrative model performance](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/modelAssessment.png)
 
 As we can see, the models do a good job of predicted the movement of each sector, with a few exceptions:
 * **Financials**: the financial sector predictions begin to diverge in late 2016 - likely due to the presidential election, which caused the market to rally around bank stocks in anticipation of financial deregulation. Here, the ARIMA model's predictions were weighted the most, and gave all the sentiment factors either little to no contribution in the model because of so much missing data in the training period - meaning that the model couldn't capture what was a sentiment-driven rally in that sector.
@@ -163,21 +116,8 @@ As we can see, the models do a good job of predicted the movement of each sector
 
 To find the optimal weights, we employ a genetic breeding algorithm, which essentially starts out with a set of random weights and "breeds" children with them, and then kills off the lowest performing sets of weights according to our objective function that we are optimizing:
 
-$$
-\max\limits_{\omega}
-\begin{pmatrix}
-0.85 \\
--0.05 \\
-0.05 \\
-0.05 \\
-\end{pmatrix}^T
-\begin{pmatrix}
-\rho_P - \rho_m \\
-|(1-u)\sigma^2_P-\sigma^2_m| \\
-VaR^{95\%}_P-VaR^{95\%}_m \\
-CVaR^{95\%}_P-CVaR^{95\%}_m \\
-\end{pmatrix}
-$$
+
+![objective function](http://www.sciweavers.org/upload/Tex2Img_1583093932/eqn.png)
 
 Ultimately, this is optimizing Sharpe ratio, as we are trying to maximize excess return, 95% VaR, and CVaR of the portfolio over the benchmark S&P 500 while trying to match the market's volatility with some undershoot percentage $u$ - this is so we can aim to achieve the investment goals outlined in the IPS of beating the market with less risk.
 
@@ -199,7 +139,7 @@ For reference, the previous optimization method used to find the best weights wa
 		* Two children come in the following way: for each sector, a random number between 0 and 1 is generated, and if it is less than 0.5, child A will inherit that sector's weight from parent 1 and child B will inherit that sector's weight from parent 2. If the number is greater than 0.5, then child A inherits from parent 2 and child B inherits from parent 1.
 		* The third child C's weights are a simple average of the weights from child A and B
 	* The children are put through a mutation function, which, with 0.5% probability for each sector, will increase that sector's weight by 1% and decrease another random sector by 1%
-	* The rules for the weights are then enforced, so if any of the children have negative weights or weights greater than 25%, the child's weights will all be set to zero, which will result in a score of $-\infin$ and definitely be killed off in the next generation. The weights of the children are normalized to make sure they sum up to 1, so that condition does not have to be checked specifically. 
+	* The rules for the weights are then enforced, so if any of the children have negative weights or weights greater than 25%, the child's weights will all be set to zero, which will result in a score of ![negative infinity](http://www.sciweavers.org/upload/Tex2Img_1583094045/eqn.png) and definitely be killed off in the next generation. The weights of the children are normalized to make sure they sum up to 1, so that condition does not have to be checked specifically. 
 
 	If we are at the tenth and final generation, then we stop the process once the bottom 2/3 of the population is killed off, and then choose the set of weights corresponding to the maximum score provided by the objective function, and then we have our optimal asset allocation across the S&P 500 sectors.
 
@@ -214,27 +154,37 @@ All graphics below are from February 28, 2020.
 
 #### Sector Weights
 
-![Pie chart of sector weights](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/weights.png)
+![Pie chart of sector weights](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/weights.png)
+
 As previously mentioned, we also save these weights in `results/weightsHistory.csv` to monitor how the weights develop over time.
 
 #### Cumulative Return Comparison
 
 1. Overall
 
-![Overall cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/cumulativeReturns.png)
+![Overall cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/cumulativeReturns.png)
+
 2. Testing Period
 
-![Testing period cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/cumulativeReturnsTest.png)
+![Testing period cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/cumulativeReturnsTest.png)
+
 3. Current Semester
 
-![Semester to date cumulative returns comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/cumulativeReturnsSem.png)
+![Semester to date cumulative returns comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/cumulativeReturnsSem.png)
+
 
 #### Portfolio Statistics vs S&P 500
 
 Here we save a table of statistics of the portfolio vs the SPX including cumulative return, total volatility, Sharpe ratio, 95% VaR and CVaR, and return comparisons for the three recessions that occurred over the period we have data for:
 
-![Portfolio statistics](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/stats.png)
+![Portfolio statistics](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/stats.png)
 
+
+## Future Plans
+
+* Get data on mutual fund inflows and outflows for each sector (currently in progress)
+* Consolidate some factors like Treasury Yields -- rather than use 2y and 10y yields separately, use the 2-10 spread
+* Finalize recession probability model and use the output of that as a macroeconomic factor in the model
 
 ------
 
