@@ -32,26 +32,26 @@ Once the data for each factor category is cleaned and processed, it is all writt
 
 #### Loading Locally-Saved Data
 
-Regardless of whether or not you're on a Bloomberg Terminal, the data is loaded from the saved files for preparation to use in the models. Most of the heavy lifting here has to do with making sure the data is formatted so it can be merged properly, as well as calculating some of the derived factors, such as PEG (or what is supposed to be PEG, the factor model when I first started working on it actually calculates this as ![price to fcf yield](http://www.sciweavers.org/upload/Tex2Img_1583094161/eqn.png). We tried fixing this so it finds ![peg formula](http://www.sciweavers.org/upload/Tex2Img_1583094106/eqn.png), but the model results became far less accurate, so it was kept as ![price to fcf yield](http://www.sciweavers.org/upload/Tex2Img_1583094161/eqn.png)). Finally, once the valuation, sentiment, and macroeconomic data are all merged for each sector, it is split up in a roughly 70/30 split into training and testing data, and then we are ready to move onto modelling.
+Regardless of whether or not you're on a Bloomberg Terminal, the data is loaded from the saved files for preparation to use in the models. Most of the heavy lifting here has to do with making sure the data is formatted so it can be merged properly, as well as calculating some of the derived factors, such as PEG (or what is supposed to be PEG, the factor model when I first started working on it actually calculates this as ![price to fcf yield](./imgs/price_fcfyield.png). We tried fixing this so it finds![peg ratio](./imgs/peg_ratio.png), but the model results became far less accurate, so it was kept as ![price to fcf yield](./imgs/price_fcfyield.png). Finally, once the valuation, sentiment, and macroeconomic data are all merged for each sector, it is split up in a roughly 70/30 split into training and testing data, and then we are ready to move onto modelling.
 
 
 ### Modelling
 
 **_Relevant files:_** `linearAnalysis.R`, `arimaAnalysis.R`, `randomForestAnalysis.R`
 
-The actual modelling that we do is split across three different methods: a linear regression, an ARIMA time series model, as well as a random forest regression. The methodology for each of these is pretty standard: each model is fitted using the training data, predictions are generated across the domain of the testing period, then we measure error between the model predictions and actual values of each sector index. The error measure was recently changed to the log of the accuracy ratio ![log error](http://www.sciweavers.org/upload/Tex2Img_1583094222/eqn.png). Previously, we had used mean absolute percentage error, but after some research, we found MAPE was a biased metric in that [it would favor models with predictions that are systematically too low](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2635088), leading to using the symmetric log-based measure.
+The actual modelling that we do is split across three different methods: a linear regression, an ARIMA time series model, as well as a random forest regression. The methodology for each of these is pretty standard: each model is fitted using the training data, predictions are generated across the domain of the testing period, then we measure error between the model predictions and actual values of each sector index. The error measure was recently changed to the log of the accuracy ratio ![log error](./imgs/log_pred_actual.png). Previously, we had used mean absolute percentage error, but after some research, we found MAPE was a biased metric in that [it would favor models with predictions that are systematically too low](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2635088), leading to using the symmetric log-based measure.
 
 #### Linear Regression
 
 The model we construct and regressors used are consistent across every sector, and used in both the linear regression and later on for the random forest regression. Currently, the linear and random forest models are constructed as follows:
 
-![model construction](http://www.sciweavers.org/upload/Tex2Img_1583094253/eqn.png)
+![model construction](./imgs/model_construction.png)
 
-where ![beta](http://www.sciweavers.org/upload/Tex2Img_1583094410/eqn.png) is the vector of coefficients that are generated when the model is fitted for each sector. The ARIMA models are similar, with additional terms ![ar terms](http://www.sciweavers.org/upload/Tex2Img_1583094442/eqn.png) and ![ma terms](http://www.sciweavers.org/upload/Tex2Img_1583094469/eqn.png) to capture the AR and MA movement, respectively.
+where ![beta](./imgs/beta.png) is the vector of coefficients that are generated when the model is fitted for each sector. The ARIMA models are similar, with additional terms ![ar terms](./imgs/ar.png) and ![ma terms](./imgs/ma.png) to capture the AR and MA movement, respectively.
 
 Once the models are all fitted using the training data, we generate the predictions for each model so that we can measure the error of each, and ultimately optimize how those predictions are blended together. The loss function that we use as a measure of error is as follows:
 
-![error calculation](http://www.sciweavers.org/upload/Tex2Img_1583094489/eqn.png)
+![Error function](./imgs/error.png)
 
 For reference, the calculated errors per sector per model (as of February 28, 2020) is as follows:
 
@@ -74,11 +74,11 @@ Since we use three modelling methods, we have to combine the predictions made by
 
 To do so, we implement an inverse weighted average method that does exactly this by calculating the inverse percentage of each model's error across all the models for that sector, then dividing each of those "factors" by the sum of all factors for that sector. Using an example (COND) makes this concept easier to understand:
 
-![error factors](http://www.sciweavers.org/upload/Tex2Img_1583094510/eqn.png)
+![factor calculation](./imgs/factor.png)
 
-![error weights](http://www.sciweavers.org/upload/Tex2Img_1583094534/eqn.png)
+![weight calculation](./imgs/weight.png)
 
-![overall error](http://www.sciweavers.org/upload/Tex2Img_1583094563/eqn.png)
+![overall error calculation](./imgs/overall_error.png)
 
 As expected, the random forest model, which has an astronomically high error compared to the linear regression and ARIMA analysis, gets almost zero weight while the lowest error from the linear regression gets over 60% weight towards the overall error and the predictions.
 
@@ -117,9 +117,9 @@ As we can see, the models do a good job of predicted the movement of each sector
 To find the optimal weights, we employ a genetic breeding algorithm, which essentially starts out with a set of random weights and "breeds" children with them, and then kills off the lowest performing sets of weights according to our objective function that we are optimizing:
 
 
-![objective function](http://www.sciweavers.org/upload/Tex2Img_1583093932/eqn.png)
+![objective function](./imgs/obj_function.png)
 
-Ultimately, this is optimizing Sharpe ratio, as we are trying to maximize excess return, 95% VaR, and CVaR of the portfolio over the benchmark S&P 500 while trying to match the market's volatility with some undershoot percentage ![u](http://www.sciweavers.org/upload/Tex2Img_1583095257/eqn.png) - this is so we can aim to achieve the investment goals outlined in the IPS of beating the market with less risk.
+Ultimately, this is optimizing Sharpe ratio, as we are trying to maximize excess return, 95% VaR, and CVaR of the portfolio over the benchmark S&P 500 while trying to match the market's volatility with some undershoot percentage ![u](./imgs/u.png) - this is so we can aim to achieve the investment goals outlined in the IPS of beating the market with less risk.
 
 For reference, the previous optimization method used to find the best weights was through a Monte Carlo simulation that generated 10,000 weights and chose the portfolio with the highest return with less risk than the market. However, the results from the simulations were far too random after every run, even when testing on the same dataset. The genetic algorithm so far has seemed to solve this problem, and in `results/weightsHistory.csv`, we started tracking the weekly factor model outputs, and controlling for some methodology changes over time, the weights are much more consistent (Note: please don't open the weights history file using Excel and then save it - Excel automatically formats the dates, so if you tried to read the file back into R, you'd run into errors and would have to discard the changes using GitHub).
 
@@ -139,7 +139,7 @@ For reference, the previous optimization method used to find the best weights wa
 		* Two children come in the following way: for each sector, a random number between 0 and 1 is generated, and if it is less than 0.5, child A will inherit that sector's weight from parent 1 and child B will inherit that sector's weight from parent 2. If the number is greater than 0.5, then child A inherits from parent 2 and child B inherits from parent 1.
 		* The third child C's weights are a simple average of the weights from child A and B
 	* The children are put through a mutation function, which, with 0.5% probability for each sector, will increase that sector's weight by 1% and decrease another random sector by 1%
-	* The rules for the weights are then enforced, so if any of the children have negative weights or weights greater than 25%, the child's weights will all be set to zero, which will result in a score of ![negative infinity](http://www.sciweavers.org/upload/Tex2Img_1583094045/eqn.png) and definitely be killed off in the next generation. The weights of the children are normalized to make sure they sum up to 1, so that condition does not have to be checked specifically. 
+	* The rules for the weights are then enforced, so if any of the children have negative weights or weights greater than 25%, the child's weights will all be set to zero, which will result in a score of ![negative infinity](./imgs/neg_infty.png) and definitely be killed off in the next generation. The weights of the children are normalized to make sure they sum up to 1, so that condition does not have to be checked specifically. 
 
 	If we are at the tenth and final generation, then we stop the process once the bottom 2/3 of the population is killed off, and then choose the set of weights corresponding to the maximum score provided by the objective function, and then we have our optimal asset allocation across the S&P 500 sectors.
 
