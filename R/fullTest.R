@@ -42,7 +42,7 @@ colnames(returnComparison) = c("Portfolio", "SPX")
 (totalReturnComparison = returnComparison[nrow(returnComparison),])
 (sdComparison = c(Portfolio=port_sd, SPX=mkt_sd))
 (sharpeComparison = returnComparison[nrow(returnComparison),]/c(port_sd, mkt_sd))
-ymax = ceiling(max(totalReturnComparison*10))*10
+ymax = ceiling(max(returnComparison*10))*10
 
 recessionDatesdf = data.frame(xmin=c(as.Date("1990-07-02"), as.Date("2001-03-01"), as.Date("2007-11-30")), 
                               xmax=c(as.Date("1991-03-01"), as.Date("2001-11-01"), as.Date("2009-06-30")))
