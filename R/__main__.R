@@ -4,7 +4,6 @@ t_start = Sys.time()
 source("packageLoad.R")
 
 #If you have access to a Bloomberg Terminal, then the data is collected fresh from Bloomberg. Otherwise, the data stored on the computer in /data is loaded in
-YEARS_IN_TEST = 9
 source("DataLoad.R")
 
 #Initialization of Running Data

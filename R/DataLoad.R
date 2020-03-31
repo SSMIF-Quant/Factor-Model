@@ -1,4 +1,5 @@
 # Define common variables and helper functions
+YEARS_IN_TEST = 9
 data.startDate <- as.Date("1990-01-31")
 sectorNames <- c("IT","FIN","ENG","HLTH","CONS","COND","INDU","UTIL","TELS","MATR")
 emptySectorList = vector("list", length = length(sectorNames))
