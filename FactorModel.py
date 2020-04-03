@@ -26,7 +26,7 @@ GRAPHICS_STYLE = {'cumulativeReturns.png': {'alt': 'cumulative returns all', 'st
 class FactorModel:
 
     def __init__(self, flask_root_path):
-        self.model_path = flask_root_path.replace("\\flaskr", "\\Factor_Model")
+        self.model_path = flask_root_path.replace("\\flaskr", "\\Factor-Model")
         self.weights = None
 
     def run(self):
