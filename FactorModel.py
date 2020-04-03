@@ -1,3 +1,8 @@
+from datetime import datetime
+import pandas as pd
+import json
+import plotly
+import plotly.graph_objs as go
 import os
 os.environ['R_HOME'] = "C:\\Program Files\\R\\R-3.6.1"  # path to your R installation
 os.environ['R_USER'] = "patel"  # your local username as found by running Sys.info()[["user"]] in R
@@ -5,9 +10,6 @@ os.environ['R_USER'] = "patel"  # your local username as found by running Sys.in
 from rpy2.robjects.packages import importr, isinstalled
 import rpy2.robjects as ro
 from rpy2.rinterface import RRuntimeError
-
-from datetime import datetime
-import pandas as pd
 
 
 # TODO: add more api endpoints to bailey that allows access to more information gathered during modelling
@@ -26,10 +28,10 @@ GRAPHICS_STYLE = {'cumulativeReturns.png': {'alt': 'cumulative returns all', 'st
 class FactorModel:
 
     def __init__(self, flask_root_path):
-        self.model_path = flask_root_path.replace("\\flaskr", "\\Factor-Model")
+        self.model_path = flask_root_path.replace("flaskr", "Factor-Model")
         self.weights = None
 
-    def run(self):
+    def run(self, save=True):
         t_start = datetime.now()
         self.load_packages()
         self.load_data()
@@ -37,6 +39,8 @@ class FactorModel:
         self.find_weights()
         self.backtest()
         t_end = datetime.now()
+        if save:
+            self.save_workspace()
         print('All done! Took ' + str(t_end - t_start))
 
     def load_packages(self):
@@ -46,7 +50,7 @@ class FactorModel:
             ro.r(package_load)
         except RRuntimeError:
             # Otherwise load packages one by one using importr
-            with open(self.model_path + "\\packages.txt") as f:
+            with open(self.model_path + "/packages.txt") as f:
                 packages = f.read().splitlines()
             try:
                 assert all([isinstalled(x) for x in packages])
@@ -118,7 +122,7 @@ class FactorModel:
         ro.r("""save.image(file.path(savePath, ".RData"))""")
 
     def load_workspace(self, path):
-        ro.r("""load("{}")""".format(path.replace("\\", "\\\\")))
+        ro.r("""load("{}")""".format(path.replace("/", "//")))
 
     def get_backtest_stats(self):
         stats = pd.DataFrame({'Metric': list(ro.r("as.character(stats$Metric)")),
@@ -137,14 +141,14 @@ class FactorModel:
             print("Make sure all the models have been ran before fetching the accuracy matrix")
         return res
 
-    def getRecentDataDate(self):
-        run_dates = os.listdir(self.model_path + '\\results')
+    def getRecentResultsDate(self):
+        run_dates = os.listdir(self.model_path + '/results')
         max_date = max([int(x) for x in run_dates if '.' not in x])
         return str(max_date)
 
     def getGraphics(self):
-        max_date = self.getRecentDataDate()
-        imgs = os.listdir(self.model_path + '\\results\\' + max_date)
+        max_date = self.getRecentResultsDate()
+        imgs = os.listdir(self.model_path + '/results/' + max_date)
         imgs = [x for x in imgs if '.png' in x]
 
         srcs, alts, styles = [], [], []
@@ -154,3 +158,39 @@ class FactorModel:
             styles.append(GRAPHICS_STYLE[img]['style'])
 
         return {'src': srcs, 'alt': alts, 'style': styles}
+
+    def getWeights(self):
+        return pd.DataFrame({'Sector': list(ro.r("sectorNames")), 'Weight': list(ro.r("weightsVector"))})
+
+    def getHistoricalWeights(self):
+        return pd.read_csv(self.model_path + '/results/weightsHistory.csv')
+
+    def getRecentDataDate(self):
+        spx = pd.read_csv(self.model_path + '/data/SPX.csv')
+        return spx['date'].iloc[-1]
+
+    def newDataAvailable(self):
+        recent_run = datetime.strptime(self.getRecentResultsDate(), '%Y%m%d')
+        recent_data = datetime.strptime(self.getRecentDataDate(), '%Y-%m-%d')
+        return recent_data > recent_run
+
+    def plotWeights(self):
+        weights = self.getWeights()
+        weights = weights.loc[weights['Weight'] > 0, ]
+        graph = dict(
+            data=dict(
+                labels=list(weights['Sector']),
+                values=list(weights['Weight']),
+                hoverinfo="label+percent",
+                type="pie"
+            ),
+            layout=dict(
+                title="Optimal Portfolio Weights",
+                margin=dict(b=30, r=0, t=50, l=0),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'
+            )
+        )
+        fig = go.FigureWidget(data=graph['data'], layout=graph['layout'])
+        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        return graphJSON
