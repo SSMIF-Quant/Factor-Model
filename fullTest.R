@@ -62,13 +62,14 @@ recessionDatesdf = data.frame(xmin=c(as.Date("1990-07-02"), as.Date("2001-03-01"
     geom_line(aes(x=as.Date(Index), y=SPX, color = "SPX")) +
     annotate("text", x = as.Date(index(totalReturnComparison)), y = totalReturnComparison$SPX*100, 
              label=paste(round(totalReturnComparison$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
-    labs(title = "Cumulative Returns Comparison") + ylab("Return (%)") + xlab("Time") +
+    labs(title = "Cumulative Returns Comparison - since 1990") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
     scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0))
+    scale_y_continuous(expand = c(0,0)) +
+    theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
 gt = ggplotGrob(returnsGraph)
 gt$layout$clip[gt$layout$name == "panel"] = "off"}
-save_plot(file.path(savePath, "cumulativeReturns.png"), plot=grid.draw(gt), base_width=8, base_height=3)
+save_plot(file.path(savePath, "cumulativeReturns.png"), plot=grid.draw(gt), base_width=8, base_height=4.5)
 
 
 # Relative Cumulative Returns (Testing Period)
@@ -84,13 +85,14 @@ ymaxTest = ceiling(max(totalReturnComparisonTest*10))*10
     geom_line(aes(x=as.Date(Index), y=SPX, color = "SPX")) +
     annotate("text", x = as.Date(index(totalReturnComparisonTest)), y = totalReturnComparisonTest$SPX*100, 
              label=paste(round(totalReturnComparisonTest$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
-    labs(title = "Cumulative Returns Comparison") + ylab("Return (%)") + xlab("Time") +
+    labs(title = "Cumulative Returns Comparison - Testing Period") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
     scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0))
+    scale_y_continuous(expand = c(0,0)) +
+    theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
 gt2 = ggplotGrob(returnsGraphTest)
 gt2$layout$clip[gt2$layout$name == "panel"] = "off"}
-save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid.draw(gt2), base_width=6, base_height=3)
+save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid.draw(gt2), base_width=6, base_height=3.5)
 
 
 # Relative Cumulative Returns (Current Semester)
@@ -109,13 +111,14 @@ ymaxTest = ceiling(max(totalReturnComparisonSem*10))*10
     geom_line(aes(x=as.Date(Index), y=SPX, color = "SPX")) +
     annotate("text", x = as.Date(index(totalReturnComparisonSem)), y = totalReturnComparisonSem$SPX*100, 
              label=paste(round(totalReturnComparisonSem$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
-    labs(title = "Cumulative Returns Comparison") + ylab("Return (%)") + xlab("Time") +
+    labs(title = "Cumulative Returns Comparison - This Semester") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
     scale_x_date(labels = date_format("%b %d"), breaks = date_breaks("1 week"), expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0))
+    scale_y_continuous(expand = c(0,0)) +
+    theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
   gt3 = ggplotGrob(returnsGraphSem)
   gt3$layout$clip[gt3$layout$name == "panel"] = "off"}
-save_plot(file.path(savePath, "cumulativeReturnsSem.png"), plot=grid.draw(gt3), base_width=6, base_height=3)
+save_plot(file.path(savePath, "cumulativeReturnsSem.png"), plot=grid.draw(gt3), base_width=6, base_height=3.5)
 
 
 # Recession Stress Test (% Return of Portfolio vs SPX)

@@ -68,4 +68,9 @@ if(require(grid)==FALSE) {
 }
 library(grid)
 
+if(require(data.table)==FALSE) {
+  install.packages("data.table")
+}
+library(data.table)
+
 print("Package Loading: Done!")
