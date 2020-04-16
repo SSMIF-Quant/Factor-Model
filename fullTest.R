@@ -16,7 +16,6 @@ weights_plot <- ggplot(weights_df[weights_df$weights > 0,], aes(x="", y=weights,
   theme(legend.position = "none") +
   scale_fill_manual(values=brewer.pal(10, "Set3")) +
   geom_text(aes(y = weights, label = paste(sectors, ": ", percent(weights), sep="")), position = position_stack(vjust = 0.5))
-save_plot(file.path(savePath, "weights.png"), plot=weights_plot, base_width=4, base_height=4)
 
 
 SPX_all = as.xts(exp(spx[[1]]), order.by = as.Date(rownames(spx[[1]])))
@@ -140,7 +139,6 @@ spx_metrics = c("1990-2020", percent(mkt_ret, 0.01), percent(mkt_sd, 0.01), roun
                 percent(VaR(SPX_all, 0.95), 0.01), percent(CVaR(SPX_all, 0.95), 0.01), percent(unname(recessionTest[2,]), 0.01))
 stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
 write.csv(stats, file.path(savePath, "stats.csv"))
-save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
 
 
 # Plot each sector's returns
