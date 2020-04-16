@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+__pycache__/
+UserGuide.synctex.gz
