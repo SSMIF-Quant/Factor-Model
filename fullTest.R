@@ -139,6 +139,7 @@ port_metrics = c("1990-2020", percent(port_cumulRet, 0.01), percent(port_sd, 0.0
 spx_metrics = c("1990-2020", percent(mkt_ret, 0.01), percent(mkt_sd, 0.01), round(mkt_ret/mkt_sd, 2),
                 percent(VaR(SPX_all, 0.95), 0.01), percent(CVaR(SPX_all, 0.95), 0.01), percent(unname(recessionTest[2,]), 0.01))
 stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
+write.csv(stats, file.path(savePath, "stats.csv"))
 save_plot(file.path(savePath, "stats.png"), plot=gridExtra::grid.table(stats, rows = NULL), base_width=3.25, base_height=2.75)
 
 
