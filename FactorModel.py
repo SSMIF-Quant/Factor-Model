@@ -166,8 +166,11 @@ class FactorModel:
         all_weights = self.getHistoricalWeights()
         return pd.DataFrame({'Sector': all_weights.columns.values[2:], 'Weight': list(all_weights.iloc[-1, 2:])})
 
-    def getHistoricalWeights(self):
-        return pd.read_csv(self.model_path + '/results/weightsHistory.csv')
+    def getHistoricalWeights(self, format_pct=False):
+        res = pd.read_csv(self.model_path + '/results/weightsHistory.csv')
+        if format_pct:
+            res.iloc[:, 2:] = [['{:.0f}%'.format(float(y) * 100) for y in x] for x in res.iloc[:, 2:].values]
+        return res
 
     def getRecentDataDate(self):
         spx = pd.read_csv(self.model_path + '/data/SPX.csv')
