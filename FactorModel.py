@@ -3,12 +3,16 @@
 * THIS WILL ONLY RETRIEVE RESULTS FROM FACTOR MODEL TO SHOW ON BAILEY
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 import json
 import plotly
 import plotly.graph_objs as go
 import os
+from bs4 import BeautifulSoup
+import requests
+import re
+from Risk_API import holdings
 # os.environ['R_HOME'] = "C:\\Program Files\\R\\R-3.6.1"  # path to your R installation
 # os.environ['R_USER'] = "patel"  # your local username as found by running Sys.info()[["user"]] in R
 
@@ -28,6 +32,10 @@ GRAPHICS_STYLE = {'cumulativeReturns.png': {'alt': 'cumulative returns all', 'st
                   'sectorReturns.png': {'alt': 'sector returns all', 'style': 'width:100%'},
                   'stats.png': {'alt': 'comparative stats', 'style': 'width:45%; float:left;'},
                   'weights.png': {'alt': 'model weights', 'style': 'width:45%; float:right;'}}
+SECTOR_DICT = {'Technology': 'IT', 'Information Technology': 'IT', 'Financials': 'FIN', 'Energy': 'ENG',
+               'Healthcare': 'HLTH', 'Health Care': 'HLTH', 'Consumer Staples': 'CONS',
+               'Consumer Discretionary': 'COND', 'Industrials': 'INDU', 'Utilities': 'UTIL', 'Communications': 'TELS',
+               'Communication Services': 'TELS', 'Materials': 'MATR', 'ETF': 'Other'}
 
 
 class FactorModel:
@@ -133,16 +141,16 @@ class FactorModel:
         stats = pd.read_csv(os.path.join(self.model_path, 'results', self.getRecentResultsDate(), 'stats.csv'))
         return stats
 
-    def get_accuracy_matrix(self):
-        res = None
-        # try:
-        #     res = pd.DataFrame({'Sector': list(ro.r("sectorNames")),
-        #                         'Linear Regression': list(ro.r("accuracyMatrix[1, ]")),
-        #                         'ARIMA Analysis': list(ro.r("accuracyMatrix[2, ]")),
-        #                         'Random Forest': list(ro.r("accuracyMatrix[3, ]"))}).set_index("Sector").T
-        # except RRuntimeError:
-        #     print("Make sure all the models have been ran before fetching the accuracy matrix")
-        return res
+    # def get_accuracy_matrix(self):
+    #     res = None
+    #     try:
+    #         res = pd.DataFrame({'Sector': list(ro.r("sectorNames")),
+    #                             'Linear Regression': list(ro.r("accuracyMatrix[1, ]")),
+    #                             'ARIMA Analysis': list(ro.r("accuracyMatrix[2, ]")),
+    #                             'Random Forest': list(ro.r("accuracyMatrix[3, ]"))}).set_index("Sector").T
+    #     except RRuntimeError:
+    #         print("Make sure all the models have been ran before fetching the accuracy matrix")
+    #     return res
 
     def getRecentResultsDate(self):
         run_dates = os.listdir(self.model_path + '/results')
@@ -163,8 +171,8 @@ class FactorModel:
         return {'src': srcs, 'alt': alts, 'style': styles}
 
     def getWeights(self):
-        all_weights = self.getHistoricalWeights()
-        return pd.DataFrame({'Sector': all_weights.columns.values[2:], 'Weight': list(all_weights.iloc[-1, 2:])})
+        weights = self.getHistoricalWeights().iloc[-1, ]
+        return {weights.index.values[i]: weights.iloc[i] for i in range(2, len(weights))}
 
     def getHistoricalWeights(self, format_pct=False):
         res = pd.read_csv(self.model_path + '/results/weightsHistory.csv')
@@ -183,21 +191,90 @@ class FactorModel:
 
     def plotWeights(self):
         weights = self.weights
-        weights = weights.loc[weights['Weight'] > 0, ]
+        weights = {k: v for k, v in weights.items() if v > 0}
+        real_weights = self.getActualAllocations()
         graph = dict(
-            data=dict(
-                labels=list(weights['Sector']),
-                values=list(weights['Weight']),
-                hoverinfo="label+percent",
-                type="pie"
-            ),
+            data=[go.Bar(
+                    text=['<b>Optimal ' + sector + ' weight: </b> {:.2f}%'.format(weight*100)
+                          for sector, weight in weights.items()],
+                    x=list(weights.keys()),
+                    y=list(weights.values()),
+                    hoverinfo="text",
+                    name='Factor Model Weights',
+                ),
+                go.Bar(
+                    text=['<b>Current ' + sector + ' weight: </b> {:.2f}%'.format(weight*100)
+                          for sector, weight in list(real_weights.items())],
+                    x=list(real_weights.keys()),
+                    y=list(real_weights.values()),
+                    hoverinfo='text',
+                    name='Current Weights',
+                )
+            ],
             layout=dict(
                 title="Optimal Portfolio Weights",
                 margin=dict(b=30, r=0, t=50, l=0),
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)'
+                plot_bgcolor='rgba(0,0,0,0)',
+                legend=dict(x=0.5, y=-0.2, xanchor='center', orientation='h')
             )
         )
         fig = go.FigureWidget(data=graph['data'], layout=graph['layout'])
         graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return graphJSON
+
+    def getActualAllocations(self, percentages=True):
+        cur_holdings = json.loads(json.loads(holdings.getHoldingsFromCSV()))
+        allocations = {v: 0 for k, v in SECTOR_DICT.items()}
+        total_holdings = sum([holding['Current_Value_MTM'] for holding in cur_holdings])
+
+        # Add up allocations to each sector in dollar amounts
+        for holding in cur_holdings:
+            # Allocate according to S&P 500 weights if holding is VOO
+            if holding['Ticker'] == 'VOO':
+                sp500_weights = self.getSPWeights()
+                for sector, weight in sp500_weights.items():
+                    allocations[SECTOR_DICT.get(sector, 'Other')] += holding['Current_Value_MTM'] * weight
+            else:
+                allocations[SECTOR_DICT.get(holding['Sector'], 'Other')] += holding['Current_Value_MTM']
+        # Calculate percentage of each sector as % of total
+        if percentages:
+            for k, v in allocations.items():
+                allocations[k] = v / total_holdings
+
+        return allocations
+
+    def getAllocationsNewSector(self, new_sector):
+        cur_weights = self.getActualAllocations(percentages=False)
+        pval = sum(cur_weights.values())
+        maxAllocation = pval / 10
+        cur_weights[SECTOR_DICT.get(new_sector, 'Other')] += maxAllocation
+
+        for k, v in cur_weights.items():
+            cur_weights[k] = v / (pval + maxAllocation)
+
+        return cur_weights
+
+    def getSPWeights(self):
+        if 'SP500Weights.csv' in os.listdir(self.model_path):
+            weights = json.loads(open('SP500Weights.txt').readlines())
+            if datetime.now().date() - datetime.strptime(weights['Date'], '%Y-%m-%d') <= timedelta(days=7):
+                weights.pop('Date')
+                return weights
+        html = requests.get("https://us.spindices.com/indices/equity/sp-500")
+        soup = BeautifulSoup(html.content, features="lxml")
+        scripts = str(soup.find_all("script"))
+        p = re.search('var indexData = (.*?);', scripts)
+        indexData = json.loads('' + p[1] + '')
+
+        sectorWeights = {}
+        for i in range(len(indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"])):
+            sector = indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"][i]["sectorDescription"]
+            weight = indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"][i]["marketCapitalPercentage"]
+            sectorWeights[sector] = weight
+
+        sectorWeights['Date'] = datetime.now().date().strftime('%Y-%m-%d')
+        f = open(os.path.join(self.model_path, 'SP500Weights.txt'), 'w')
+        f.write(json.dumps(sectorWeights))
+        sectorWeights.pop('Date')
+        return sectorWeights
