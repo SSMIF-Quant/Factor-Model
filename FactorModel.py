@@ -133,16 +133,16 @@ class FactorModel:
         stats = pd.read_csv(os.path.join(self.model_path, 'results', self.getRecentResultsDate(), 'stats.csv'))
         return stats
 
-    def get_accuracy_matrix(self):
-        res = None
-        # try:
-        #     res = pd.DataFrame({'Sector': list(ro.r("sectorNames")),
-        #                         'Linear Regression': list(ro.r("accuracyMatrix[1, ]")),
-        #                         'ARIMA Analysis': list(ro.r("accuracyMatrix[2, ]")),
-        #                         'Random Forest': list(ro.r("accuracyMatrix[3, ]"))}).set_index("Sector").T
-        # except RRuntimeError:
-        #     print("Make sure all the models have been ran before fetching the accuracy matrix")
-        return res
+    # def get_accuracy_matrix(self):
+    #     res = None
+    #     try:
+    #         res = pd.DataFrame({'Sector': list(ro.r("sectorNames")),
+    #                             'Linear Regression': list(ro.r("accuracyMatrix[1, ]")),
+    #                             'ARIMA Analysis': list(ro.r("accuracyMatrix[2, ]")),
+    #                             'Random Forest': list(ro.r("accuracyMatrix[3, ]"))}).set_index("Sector").T
+    #     except RRuntimeError:
+    #         print("Make sure all the models have been ran before fetching the accuracy matrix")
+    #     return res
 
     def getRecentResultsDate(self):
         run_dates = os.listdir(self.model_path + '/results')
