@@ -3,12 +3,16 @@
 * THIS WILL ONLY RETRIEVE RESULTS FROM FACTOR MODEL TO SHOW ON BAILEY
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 import json
 import plotly
 import plotly.graph_objs as go
 import os
+from bs4 import BeautifulSoup
+import requests
+import re
+from Risk_API import holdings
 # os.environ['R_HOME'] = "C:\\Program Files\\R\\R-3.6.1"  # path to your R installation
 # os.environ['R_USER'] = "patel"  # your local username as found by running Sys.info()[["user"]] in R
 
@@ -163,8 +167,8 @@ class FactorModel:
         return {'src': srcs, 'alt': alts, 'style': styles}
 
     def getWeights(self):
-        all_weights = self.getHistoricalWeights()
-        return pd.DataFrame({'Sector': all_weights.columns.values[2:], 'Weight': list(all_weights.iloc[-1, 2:])})
+        weights = self.getHistoricalWeights().iloc[-1, ]
+        return {weights.index.values[i]: weights.iloc[i] for i in range(2, len(weights))}
 
     def getHistoricalWeights(self, format_pct=False):
         res = pd.read_csv(self.model_path + '/results/weightsHistory.csv')
@@ -183,19 +187,32 @@ class FactorModel:
 
     def plotWeights(self):
         weights = self.weights
-        weights = weights.loc[weights['Weight'] > 0, ]
+        weights = {k: v for k, v in weights.items() if v > 0}
+        real_weights = self.getActualAllocations()
         graph = dict(
-            data=dict(
-                labels=list(weights['Sector']),
-                values=list(weights['Weight']),
-                hoverinfo="label+percent",
-                type="pie"
-            ),
+            data=[go.Bar(
+                    text=['<b>Optimal ' + sector + ' weight: </b> {:.2f}%'.format(weight*100)
+                          for sector, weight in weights.items()],
+                    x=list(weights.keys()),
+                    y=list(weights.values()),
+                    hoverinfo="text",
+                    name='Factor Model Weights',
+                ),
+                go.Bar(
+                    text=['<b>Current ' + sector + ' weight: </b> {:.2f}%'.format(weight*100)
+                          for sector, weight in list(real_weights.items())],
+                    x=list(real_weights.keys()),
+                    y=list(real_weights.values()),
+                    hoverinfo='text',
+                    name='Current Weights',
+                )
+            ],
             layout=dict(
                 title="Optimal Portfolio Weights",
                 margin=dict(b=30, r=0, t=50, l=0),
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)'
+                plot_bgcolor='rgba(0,0,0,0)',
+                legend=dict(x=0.5, y=-0.2, xanchor='center', orientation='h')
             )
         )
         fig = go.FigureWidget(data=graph['data'], layout=graph['layout'])
