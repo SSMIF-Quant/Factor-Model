@@ -32,6 +32,10 @@ GRAPHICS_STYLE = {'cumulativeReturns.png': {'alt': 'cumulative returns all', 'st
                   'sectorReturns.png': {'alt': 'sector returns all', 'style': 'width:100%'},
                   'stats.png': {'alt': 'comparative stats', 'style': 'width:45%; float:left;'},
                   'weights.png': {'alt': 'model weights', 'style': 'width:45%; float:right;'}}
+SECTOR_DICT = {'Technology': 'IT', 'Information Technology': 'IT', 'Financials': 'FIN', 'Energy': 'ENG',
+               'Healthcare': 'HLTH', 'Health Care': 'HLTH', 'Consumer Staples': 'CONS',
+               'Consumer Discretionary': 'COND', 'Industrials': 'INDU', 'Utilities': 'UTIL', 'Communications': 'TELS',
+               'Communication Services': 'TELS', 'Materials': 'MATR', 'ETF': 'Other'}
 
 
 class FactorModel:
@@ -218,3 +222,59 @@ class FactorModel:
         fig = go.FigureWidget(data=graph['data'], layout=graph['layout'])
         graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return graphJSON
+
+    def getActualAllocations(self, percentages=True):
+        cur_holdings = json.loads(json.loads(holdings.getHoldingsFromCSV()))
+        allocations = {v: 0 for k, v in SECTOR_DICT.items()}
+        total_holdings = sum([holding['Current_Value_MTM'] for holding in cur_holdings])
+
+        # Add up allocations to each sector in dollar amounts
+        for holding in cur_holdings:
+            # Allocate according to S&P 500 weights if holding is VOO
+            if holding['Ticker'] == 'VOO':
+                sp500_weights = self.getSPWeights()
+                for sector, weight in sp500_weights.items():
+                    allocations[SECTOR_DICT.get(sector, 'Other')] += holding['Current_Value_MTM'] * weight
+            else:
+                allocations[SECTOR_DICT.get(holding['Sector'], 'Other')] += holding['Current_Value_MTM']
+        # Calculate percentage of each sector as % of total
+        if percentages:
+            for k, v in allocations.items():
+                allocations[k] = v / total_holdings
+
+        return allocations
+
+    def getAllocationsNewSector(self, new_sector):
+        cur_weights = self.getActualAllocations(percentages=False)
+        pval = sum(cur_weights.values())
+        maxAllocation = pval / 10
+        cur_weights[SECTOR_DICT.get(new_sector, 'Other')] += maxAllocation
+
+        for k, v in cur_weights.items():
+            cur_weights[k] = v / (pval + maxAllocation)
+
+        return cur_weights
+
+    def getSPWeights(self):
+        if 'SP500Weights.csv' in os.listdir(self.model_path):
+            weights = json.loads(open('SP500Weights.txt').readlines())
+            if datetime.now().date() - datetime.strptime(weights['Date'], '%Y-%m-%d') <= timedelta(days=7):
+                weights.pop('Date')
+                return weights
+        html = requests.get("https://us.spindices.com/indices/equity/sp-500")
+        soup = BeautifulSoup(html.content, features="lxml")
+        scripts = str(soup.find_all("script"))
+        p = re.search('var indexData = (.*?);', scripts)
+        indexData = json.loads('' + p[1] + '')
+
+        sectorWeights = {}
+        for i in range(len(indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"])):
+            sector = indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"][i]["sectorDescription"]
+            weight = indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"][i]["marketCapitalPercentage"]
+            sectorWeights[sector] = weight
+
+        sectorWeights['Date'] = datetime.now().date().strftime('%Y-%m-%d')
+        f = open(os.path.join(self.model_path, 'SP500Weights.txt'), 'w')
+        f.write(json.dumps(sectorWeights))
+        sectorWeights.pop('Date')
+        return sectorWeights
