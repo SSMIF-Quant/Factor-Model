@@ -12,7 +12,11 @@ import os
 from bs4 import BeautifulSoup
 import requests
 import re
-from Risk_API import holdings
+import importlib
+import sys
+from pathlib import Path
+sys.path.append(os.path.join(Path(__file__).parent.absolute(), "flaskr"))
+from flaskr.Risk_API import holdings
 # os.environ['R_HOME'] = "C:\\Program Files\\R\\R-3.6.1"  # path to your R installation
 # os.environ['R_USER'] = "patel"  # your local username as found by running Sys.info()[["user"]] in R
 
