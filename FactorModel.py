@@ -193,6 +193,7 @@ class FactorModel:
         weights = self.weights
         weights = {k: v for k, v in weights.items() if v > 0}
         real_weights = self.getActualAllocations()
+        sp_weights = self.getSPWeights()
         graph = dict(
             data=[go.Bar(
                     text=['<b>Optimal ' + sector + ' weight: </b> {:.2f}%'.format(weight*100)
@@ -209,6 +210,14 @@ class FactorModel:
                     y=list(real_weights.values()),
                     hoverinfo='text',
                     name='Current Weights',
+                ),
+                go.Bar(
+                    text=['<b>S&P ' + SECTOR_DICT.get(sector, 'Other') + ' weight: </b> {:.2f}%'.format(weight*100)
+                          for sector, weight in list(sp_weights.items())],
+                    x=list(map(lambda x: SECTOR_DICT.get(x, 'Other'), sp_weights.keys())),
+                    y=list(sp_weights.values()),
+                    hoverinfo='text',
+                    name='S&P 500 Weights',
                 )
             ],
             layout=dict(
@@ -256,9 +265,9 @@ class FactorModel:
         return cur_weights
 
     def getSPWeights(self):
-        if 'SP500Weights.csv' in os.listdir(self.model_path):
-            weights = json.loads(open('SP500Weights.txt').readlines())
-            if datetime.now().date() - datetime.strptime(weights['Date'], '%Y-%m-%d') <= timedelta(days=7):
+        if 'SP500Weights.txt' in os.listdir(self.model_path):
+            weights = json.loads(open(os.path.join(self.model_path, 'SP500Weights.txt')).read())
+            if datetime.now().date() - datetime.strptime(weights['Date'], '%Y-%m-%d').date() <= timedelta(days=7):
                 weights.pop('Date')
                 return weights
         html = requests.get("https://us.spindices.com/indices/equity/sp-500")
