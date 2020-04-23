@@ -102,7 +102,7 @@ Using the February 28th data again, these are the factors, model weights, and ov
 
 To help keep track of how these models are performing, and to make it easier to interpret model performance, we created a graphic that illustrates the cumulative return of each sector during the testing period as predicted by the models versus the actual return:
 
-![Illustrative model performance](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/modelAssessment.png)
+![Illustrative model performance](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/modelAssessment.png)
 
 As we can see, the models do a good job of predicted the movement of each sector, with a few exceptions:
 * **Financials**: the financial sector predictions begin to diverge in late 2016 - likely due to the presidential election, which caused the market to rally around bank stocks in anticipation of financial deregulation. Here, the ARIMA model's predictions were weighted the most, and gave all the sentiment factors either little to no contribution in the model because of so much missing data in the training period - meaning that the model couldn't capture what was a sentiment-driven rally in that sector.
