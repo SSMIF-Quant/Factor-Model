@@ -154,7 +154,7 @@ All graphics below are from February 28, 2020.
 
 #### Sector Weights
 
-![Pie chart of sector weights](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/weights.png)
+![Pie chart of sector weights](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/weights.png)
 
 As previously mentioned, we also save these weights in `results/weightsHistory.csv` to monitor how the weights develop over time.
 
@@ -162,30 +162,30 @@ As previously mentioned, we also save these weights in `results/weightsHistory.c
 
 1. Overall
 
-![Overall cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/cumulativeReturns.png)
+![Overall cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/cumulativeReturns.png)
 
 2. Testing Period
 
-![Testing period cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/cumulativeReturnsTest.png)
+![Testing period cumulative return comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/cumulativeReturnsTest.png)
 
 3. Current Semester
 
-![Semester to date cumulative returns comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/cumulativeReturnsSem.png)
+![Semester to date cumulative returns comparison](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/cumulativeReturnsSem.png)
 
 
 #### Portfolio Statistics vs S&P 500
 
 Here we save a table of statistics of the portfolio vs the SPX including cumulative return, total volatility, Sharpe ratio, 95% VaR and CVaR, and return comparisons for the three recessions that occurred over the period we have data for:
 
-![Portfolio statistics](https://github.com/SSMIF-Quant/Factor-Model/raw/master/R/results/20200228/stats.png)
+![Portfolio statistics](https://github.com/SSMIF-Quant/Factor-Model/raw/master/results/20200228/stats.png)
 
 
 ## Future Plans
 
-* Get data on mutual fund inflows and outflows for each sector (currently in progress)
-* Consolidate some factors like Treasury Yields -- rather than use 2y and 10y yields separately, use the 2-10 spread
+* Get data on mutual fund inflows and outflows for each sector (currently in progress from Morningstar)
+* In reality, rebalancing is a big part of portfolio management - try to work that into the model (rebalance/reoptimize weights every August, January (and May?) during the backtest to simulate senior management changing around holdings to fit the model allocations)
+  * Kaufman has made it clear he wants to have data going as far back as possible (right now farthest back is 1990), so rebalancing while continuing to incorporate this might be tricky, but doing a lot of research on it and reading papers about portfolio optimization and rebalancing might be required to figure out the best approach forward.
 * Finalize recession probability model and use the output of that as a macroeconomic factor in the model
-
 ------
 
 _All methodology described above as of Feb 22, 2020_
