@@ -112,7 +112,7 @@ ymaxTest = ceiling(max(totalReturnComparisonSem*10))*10
              label=paste(round(totalReturnComparisonSem$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
     labs(title = "Cumulative Returns Comparison - This Semester") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
-    scale_x_date(labels = date_format("%b %d"), breaks = date_breaks("1 week"), expand = c(0,0)) +
+    scale_x_date(labels = date_format("%b %d"), breaks = date_breaks("1 month"), expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0)) +
     theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
   gt3 = ggplotGrob(returnsGraphSem)
@@ -136,7 +136,7 @@ metrics = c("Period", "Return", "Risk", "Sharpe", "Daily 95% VaR", "Daily 95% CV
 port_metrics = c("1990-2020", percent(port_cumulRet, 0.01), percent(port_sd, 0.01), round(port_cumulRet/port_sd, 2),
                  percent(VaR(port, 0.95), 0.01), percent(CVaR(port, 0.95), 0.01), percent(unname(recessionTest[1,]), 0.01))
 spx_metrics = c("1990-2020", percent(mkt_ret, 0.01), percent(mkt_sd, 0.01), round(mkt_ret/mkt_sd, 2),
-                percent(VaR(SPX_all, 0.95), 0.01), percent(CVaR(SPX_all, 0.95), 0.01), percent(unname(recessionTest[2,]), 0.01))
+                percent(VaR(SPX_all, 0.95), 0.01), percent(CVarR(SPX_all, 0.95), 0.01), percent(unname(recessionTest[2,]), 0.01))
 stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
 write.csv(stats, file.path(savePath, "stats.csv"), row.names = F)
 
