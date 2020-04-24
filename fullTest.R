@@ -112,7 +112,7 @@ ymaxTest = ceiling(max(totalReturnComparisonSem*10))*10
              label=paste(round(totalReturnComparisonSem$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
     labs(title = "Cumulative Returns Comparison - This Semester") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
-    scale_x_date(labels = date_format("%b %d"), breaks = date_breaks("1 month"), expand = c(0,0)) +
+    scale_x_date(labels = date_format("%b %d"), breaks = date_breaks("2 weeks"), expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0)) +
     theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
   gt3 = ggplotGrob(returnsGraphSem)
