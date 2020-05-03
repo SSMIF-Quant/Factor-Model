@@ -151,7 +151,7 @@ sectorReturns <- ggplot(sectorPricesdf) +
     scale_color_manual("", breaks = sectorPricesdf$sector, values=c(rainbow(6, start=0.9), distinctColorPalette(k=4))) +
     labs(title="Sector Returns") + xlab("Year") + ylab("Return") +
     scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0))}
+    scale_y_continuous(expand = c(0,0), labels = percent_format())}
 ggsave(file.path(savePath, "sectorReturns.png"), plot=sectorReturns, width=8, height=3, units="in")
 
 
