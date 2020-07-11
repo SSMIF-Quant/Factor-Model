@@ -72,5 +72,6 @@ if(require(data.table)==FALSE) {
   install.packages("data.table")
 }
 library(data.table)
-
+#devtools::install_github('christophergandrud/DataCombine')
+shift <- data.table::shift
 print("Package Loading: Done!")
