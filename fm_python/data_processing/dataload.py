@@ -3,54 +3,31 @@ import numpy as np
 import pdblp
 from typing import List
 from datetime import date
+from constants import holidays, sectors, sector_valuation_fields, start_date, end_date
+
+def blpstring(d: date) -> str:
+    """
+    :param d: a datetime date object
+    :return: A string corresponding to the string yyyymmdd - the format that blpapi likes for ingesting dates
+    """
+    return d.strftime('%Y%m%d')
 
 
-# List of sectors that we will pull data on
-sectors: List[str] = ["S5INFT Index", "S5FINL Index", "S5ENRS Index", "S5HLTH Index",
-                      "S5CONS Index", "S5COND Index", "S5INDU Index", "S5UTIL Index",
-                      "S5TELS Index", "S5MATR Index"]
-
-# These will be used to pull sentiment data on the sectors because the indices themselves don't have that available
-sector_etfs: List[str] = ["XLK US Equity", "XLF US Equity", "XLE US Equity", "XLV US Equity",
-                          "XLP US Equity", "XLY US Equity", "XLI US Equity", "XLU US Equity",
-                          "XLC US Equity", "XLB US Equity"]
-
-# List of valuation fields we will pull with regards to each sector
-sector_valuation_fields: List[str] = ["PX_LAST","PE_RATIO", "PX_TO_BOOK_RATIO", "PX_TO_SALES_RATIO",
-                                      "FREE_CASH_FLOW_YIELD", "EST_LTG_EPS_AGGTE", "TOT_DEBT_TO_TOT_ASSET",
-                                      "EARN_YLD"]
-
-# Fields that will be applied to the sector_etfs to approximate sentiment for the sector indices
-sentiment_fields: List[str] = ["PX_LAST", "PUT_CALL_OPEN_INTEREST_RATIO", "EQY_INST_PCT_SH_OUT", "PX_VOLUME"]
-
-# Fields used to pull macroeconomic data from
-macroeconomic_indices: List[str] = ["EHGDUS Index", "USGG2YR Index", "USGG10YR Index",
-                                    "USURTOT Index", "PRUSTOT Index", "CONSSENT Index",
-                                    "CPI YOY Index"]
-
-holidays: List[date] = [date(1994, 4, 27), date(2001, 9, 11), date(2001, 9, 14), date(2004, 6, 11),  date(2007, 1, 2),  date(2012, 10, 29), date(2012, 10, 30), date(2018, 12, 5)]
+master_dataframe_list: List[pd.DataFrame] = []
 
 try:
     con = pdblp.BCon()
     con.start()
 
-    spx: pd.DataFrame = con.bdh(['SPX Index'], ['PX_LAST'], '20190101', '20200101')
+    spx: pd.DataFrame = con.bdh(['SPX Index'], ['PX_LAST'], blpstring(start_date), blpstring(end_date))
 
-except:
-    print("Cannot connect to bloomberg, loading data from local filesystem")
+    for index in sectors:
+        master_dataframe_list.append(con.bdh([index], sector_valuation_fields, blpstring(start_date), blpstring(end_date)))
 
+except (ValueError, ConnectionError):
+    print("cannot load data from bloomberg")
 
-
-
-
-print(spx.head())
-print(spx.tail())
-
-"""
-Data that we need to load from bloomberg: SPX
-"""
-
-
-"""
-Data that needs to be calculated from 
-"""
+print(len(master_dataframe_list))
+print(len(master_dataframe_list[2]))
+for x in range(len(master_dataframe_list)):
+    print(master_dataframe_list[x].columns)
