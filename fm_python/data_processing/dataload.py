@@ -3,17 +3,15 @@ import numpy as np
 import pdblp
 from typing import List
 from datetime import date
-from constants import holidays, sectors, sector_valuation_fields, start_date, end_date
-
-def blpstring(d: date) -> str:
-    """
-    :param d: a datetime date object
-    :return: A string corresponding to the string yyyymmdd - the format that blpapi likes for ingesting dates
-    """
-    return d.strftime('%Y%m%d')
+from helpers import blpstring
+from cleaning import remove_holidays_and_fill_na
+from constants import holidays, sectors, sector_valuation_fields, start_date, end_date, macroeconomic_indices, sector_etfs, sentiment_fields
 
 
 master_dataframe_list: List[pd.DataFrame] = []
+macroeconomic_data: List[pd.DataFrame] = []
+sentiment_data: List[pd.DataFrame] = []
+valuation_data: List[pd.DataFrame] = []
 
 try:
     con = pdblp.BCon()
@@ -22,7 +20,23 @@ try:
     spx: pd.DataFrame = con.bdh(['SPX Index'], ['PX_LAST'], blpstring(start_date), blpstring(end_date))
 
     for index in sectors:
-        master_dataframe_list.append(con.bdh([index], sector_valuation_fields, blpstring(start_date), blpstring(end_date)))
+        frame: pd.DataFrame = con.bdh([index], sector_valuation_fields, blpstring(start_date), blpstring(end_date))
+        frame = remove_holidays_and_fill_na(frame)
+        master_dataframe_list.append(frame)
+        valuation_data.append(frame)
+
+    for index in macroeconomic_indices:
+        frame: pd.DataFrame = con.bdh(con.bdh(index, ['PX_LAST'], blpstring(start_date), blpstring(end_date)))
+        frame = remove_holidays_and_fill_na(frame)
+        master_dataframe_list.append(frame)
+        macroeconomic_data.append(frame)
+
+    for index in sector_etfs:
+        frame: pd.DataFrame = con.bdh(con.bdh(index, sentiment_fields, blpstring(start_date), blpstring(end_date)))
+        frame = remove_holidays_and_fill_na(frame)
+        master_dataframe_list.append(frame)
+        valuation_data.append(frame)
+
 
 except (ValueError, ConnectionError):
     print("cannot load data from bloomberg")
