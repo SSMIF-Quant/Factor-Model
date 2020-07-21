@@ -1,6 +1,9 @@
 from datetime import date
 from typing import List
+import os
 
+ROOT_DIR: str = os.path.dirname(os.path.abspath(__file__))
+CLEAN_DATA_FOLDER: str = "clean_data"
 start_date: date = date(2019, 1, 1)
 end_date: date = date(2020, 1, 1)
 

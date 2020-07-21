@@ -1,14 +1,11 @@
 import pandas as pd
-import numpy as np
-from datetime import date
-from constants import holidays
+from typing import Union
 
 
-def remove_holidays_and_fill_na(frame: pd.DataFrame) -> pd.DataFrame:
+def fill_na(frame: Union[pd.DataFrame, pd.MultiIndex]) -> Union[pd.DataFrame, pd.MultiIndex]:
     """
     :param frame: input data frame
-    :return: the data frame with all of the holiday values removed and all empty values replaced with the previous
-             valid value
+    :return: the data frame with all empty values replaced with the previous
+             valid value. If there is no previous value, replace with the next valid value
     """
-    frame: pd.DataFrame = frame.drop(holidays)
-    return frame.fillna(method='ffill', inplace=True)
+    return frame.fillna(method='ffill', inplace=False).fillna(method="bfill", inplace=False)
