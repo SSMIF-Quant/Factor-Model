@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Union, List
 import pandas as pd
-
+from cleaning import fill_na
 
 def blpstring(d: date, fmt="block") -> str:
     """
@@ -23,3 +23,13 @@ def write_datasets_to_file(paths: List[str], frames: List[List[pd.DataFrame]]) -
     for path, frame in zip(paths, frames):
         with open(path, "w"):
             pd.concat(frame).to_csv(path)
+
+
+
+def load_dataset(dataset_names: List[str], dataset_valuation_fields: List[str], start_date: date, end_date: date) -> List[pd.DataFrame]:
+    output_data = []
+    for index in dataset_names:
+        frame: pd.DataFrame = con.bdh([index], dataset_valuation_fields, blpstring(start_date), blpstring(end_date))
+        frame = fill_na(frame)
+        ouput_data.append(frame)
+    return output_data
