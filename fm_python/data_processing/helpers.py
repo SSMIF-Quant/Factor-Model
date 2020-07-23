@@ -1,8 +1,8 @@
 from datetime import date
 from typing import Union, List
 import pandas as pd
-from cleaning import fill_na
-from decorators import NonNullArgs
+from .cleaning import fill_na
+from .decorators import NonNullArgs
 
 
 @NonNullArgs

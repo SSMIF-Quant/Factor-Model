@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="f2424fdc-f1eb-4f0c-9060-16a5120f23d8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data_processing/decorators.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/linear_regression/linear_regression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/fm_python.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/fm_python.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/cleaning.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/cleaning.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/dataload.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/dataload.py" afterDir="false" />
@@ -39,23 +58,12 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\miked\git\Factor-Model\fm_python\data_processing" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager">
     <configuration name="dataload" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -103,12 +111,21 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2657" y="309" width="424" height="477" key="FileChooserDialogImpl" timestamp="1595507636091">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2657" y="309" width="424" height="477" key="FileChooserDialogImpl/1920.0.1920.1080/0.31.1920.1049@1920.0.1920.1080" timestamp="1595507636091" />
+    <state x="2376" y="190" key="SettingsEditor" timestamp="1595507671900">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2376" y="190" key="SettingsEditor/1920.0.1920.1080/0.31.1920.1049@1920.0.1920.1080" timestamp="1595507671900" />
   </component>
 </project>
