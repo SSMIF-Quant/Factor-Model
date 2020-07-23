@@ -38,7 +38,8 @@ for (i in 1:length(overallError)) {
 }
 names(overallError) <- sectorNames
 
-covMat = cov((masterPredictionsMat/shift(masterPredictionsMat,1))[-1,])
+
+covMat = cov((masterPredictionsMat/data.table::shift(masterPredictionsMat,1))[-1,])
 
 
 # Implement Genetic Optimization Algorithm

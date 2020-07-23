@@ -7,6 +7,7 @@ if(!file.exists(resultsFolder)) {
   dir.create(savePath)
 }
 
+
 # Plot weights
 weights_df = data.frame(weights=weightsVector, sectors=names(weightsVector))
 weights_plot <- ggplot(weights_df[weights_df$weights > 0,], aes(x="", y=weights, fill=sectors)) + 
@@ -14,7 +15,7 @@ weights_plot <- ggplot(weights_df[weights_df$weights > 0,], aes(x="", y=weights,
   coord_polar("y") + 
   theme_void() + 
   theme(legend.position = "none") +
-  scale_fill_manual(values=brewer.pal(10, "Set3")) +
+  scale_fill_manual(values=RColorBrewer::brewer.pal(10, "Set3")) +
   geom_text(aes(y = weights, label = paste(sectors, ": ", percent(weights), sep="")), position = position_stack(vjust = 0.5))
 
 
@@ -63,12 +64,12 @@ recessionDatesdf = data.frame(xmin=c(as.Date("1990-07-02"), as.Date("2001-03-01"
              label=paste(round(totalReturnComparison$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
     labs(title = "Cumulative Returns Comparison - since 1990") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
-    scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
+    scale_x_date(labels = scales::date_format("%Y"), breaks = scales::date_breaks("2 years"), expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0)) +
     theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
-gt = ggplotGrob(returnsGraph)
+gt = ggplot2::ggplotGrob(returnsGraph)
 gt$layout$clip[gt$layout$name == "panel"] = "off"}
-save_plot(file.path(savePath, "cumulativeReturns.png"), plot=grid.draw(gt), base_width=8, base_height=4.5)
+cowplot::save_plot(file.path(savePath, "cumulativeReturns.png"), plot=grid::grid.draw(gt), base_width=8, base_height=4.5)
 
 
 # Relative Cumulative Returns (Testing Period)
@@ -86,12 +87,12 @@ ymaxTest = ceiling(max(totalReturnComparisonTest*10))*10
              label=paste(round(totalReturnComparisonTest$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
     labs(title = "Cumulative Returns Comparison - Testing Period") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
-    scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
+    scale_x_date(labels = scales::date_format("%Y"), breaks = scales::date_breaks("2 years"), expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0)) +
     theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
 gt2 = ggplotGrob(returnsGraphTest)
 gt2$layout$clip[gt2$layout$name == "panel"] = "off"}
-save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid.draw(gt2), base_width=6, base_height=3.5)
+cowplot::save_plot(file.path(savePath, "cumulativeReturnsTest.png"), plot=grid::grid.draw(gt2), base_width=6, base_height=3.5)
 
 
 # Relative Cumulative Returns (Current Semester)
@@ -112,12 +113,12 @@ ymaxTest = ceiling(max(totalReturnComparisonSem*10))*10
              label=paste(round(totalReturnComparisonSem$SPX*100, 2), "%", sep=""), hjust = -0.08, size = 3.25) +
     labs(title = "Cumulative Returns Comparison - This Semester") + ylab("Return (%)") + xlab("Time") +
     scale_color_manual("",breaks = c("Portfolio","SPX"),values = c("red","blue")) +
-    scale_x_date(labels = date_format("%b %d"), breaks = date_breaks("2 weeks"), expand = c(0,0)) +
+    scale_x_date(labels = scales::date_format("%b %d"), breaks = scales::date_breaks("2 weeks"), expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0)) +
     theme(legend.position="top", plot.margin=unit(c(0.5,1.5,0.5,0.5),"cm"))
   gt3 = ggplotGrob(returnsGraphSem)
   gt3$layout$clip[gt3$layout$name == "panel"] = "off"}
-save_plot(file.path(savePath, "cumulativeReturnsSem.png"), plot=grid.draw(gt3), base_width=6, base_height=3.5)
+cowplot::save_plot(file.path(savePath, "cumulativeReturnsSem.png"), plot=grid::grid.draw(gt3), base_width=6, base_height=3.5)
 
 
 # Recession Stress Test (% Return of Portfolio vs SPX)
@@ -133,10 +134,10 @@ recessionTest*100
 
 # Put stats into dataframe and save image of it
 metrics = c("Period", "Return", "Risk", "Sharpe", "Daily 95% VaR", "Daily 95% CVaR", "1990 Recession", "2001 Recession", "2008 Recession")
-port_metrics = c("1990-2020", percent(port_cumulRet, 0.01), percent(port_sd, 0.01), round(port_cumulRet/port_sd, 2),
-                 percent(VaR(port, 0.95), 0.01), percent(CVaR(port, 0.95), 0.01), percent(unname(recessionTest[1,]), 0.01))
-spx_metrics = c("1990-2020", percent(mkt_ret, 0.01), percent(mkt_sd, 0.01), round(mkt_ret/mkt_sd, 2),
-                percent(VaR(SPX_all, 0.95), 0.01), percent(CVaR(SPX_all, 0.95), 0.01), percent(unname(recessionTest[2,]), 0.01))
+port_metrics = c("1990-2020", scales::percent(port_cumulRet, 0.01), scales::percent(port_sd, 0.01), round(port_cumulRet/port_sd, 2),
+                 scales::percent(VaR(port, 0.95), 0.01), scales::percent(CVaR(port, 0.95), 0.01), scales::percent(unname(recessionTest[1,]), 0.01))
+spx_metrics = c("1990-2020", scales::percent(mkt_ret, 0.01), scales::percent(mkt_sd, 0.01), round(mkt_ret/mkt_sd, 2),
+                scales::percent(VaR(SPX_all, 0.95), 0.01), scales::percent(CVaR(SPX_all, 0.95), 0.01), scales::percent(unname(recessionTest[2,]), 0.01))
 stats = data.frame(Metric=metrics, Portfolio=port_metrics, SPX=spx_metrics)
 write.csv(stats, file.path(savePath, "stats.csv"), row.names = F)
 
@@ -148,10 +149,10 @@ sectorPricesdf = melt(sectorPricesdf, id.vars="date", variable.name="sector", va
 sectorReturns <- ggplot(sectorPricesdf) + 
     geom_rect(data = recessionDatesdf, aes(xmin=xmin,xmax=xmax,ymin=-.8,ymax=3.5), fill="darkgrey", alpha=0.5) + 
     geom_line(aes(x=as.Date(date), y=return, color=sector, group=sector), size=0.1) +
-    scale_color_manual("", breaks = sectorPricesdf$sector, values=c(rainbow(6, start=0.9), distinctColorPalette(k=4))) +
+    scale_color_manual("", breaks = sectorPricesdf$sector, values=c(rainbow(6, start=0.9), randomcoloR::distinctColorPalette(k=4))) +
     labs(title="Sector Returns") + xlab("Year") + ylab("Return") +
-    scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"), expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0), labels = percent_format())}
+    scale_x_date(labels = scales::date_format("%Y"), breaks = scales::date_breaks("2 years"), expand = c(0,0)) +
+    scale_y_continuous(expand = c(0,0), labels = scales::percent_format())}
 ggsave(file.path(savePath, "sectorReturns.png"), plot=sectorReturns, width=8, height=3, units="in")
 
 
@@ -167,7 +168,7 @@ predDF$Type = "Pred"
   geom_line(aes(x=Date, y=CumulativeReturn, color=Type), size=0.3) + 
   facet_wrap(~sector, nrow = 2) +
   labs(title="Model Predictions vs. Actual Sector Levels (2011-Present)", ylab="Cumulative Return (%)") +
-  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("3 years"), expand = c(0,0)))}
+  scale_x_date(labels = scales::date_format("%Y"), breaks = scales::date_breaks("3 years"), expand = c(0,0)))}
 ggsave(file.path(savePath, "modelAssessment.png"), plot=modelAssessment, width=8, height=4, units="in")
 
 
