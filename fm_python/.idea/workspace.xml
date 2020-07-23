@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f2424fdc-f1eb-4f0c-9060-16a5120f23d8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/data_processing/decorators.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/cleaning.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/cleaning.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/dataload.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/dataload.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/helpers.py" afterDir="false" />
     </list>
@@ -37,6 +39,23 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\miked\git\Factor-Model\fm_python\data_processing" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager">
     <configuration name="dataload" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -84,11 +103,12 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

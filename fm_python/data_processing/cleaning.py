@@ -1,7 +1,9 @@
 import pandas as pd
 from typing import Union
+from decorators import NonNullArgs
 
 
+@NonNullArgs
 def fill_na(frame: Union[pd.DataFrame, pd.MultiIndex]) -> Union[pd.DataFrame, pd.MultiIndex]:
     """
     :param frame: input data frame
