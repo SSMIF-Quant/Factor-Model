@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592775199546.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "16430384",
+    "lastKnownWriteTime" : 1592775138,
+    "last_content_update" : 1593996341711,
+    "path" : "C:/Users/miked/git/Factor-Model/__main__.R",
+    "project_path" : "__main__.R",
+    "properties" : {
+        "cursorPosition" : "31,25",
+        "scrollLine" : "1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

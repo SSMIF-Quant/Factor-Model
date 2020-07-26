@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1593996820445.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "6A83037E",
+    "lastKnownWriteTime" : 1592775139,
+    "last_content_update" : 1592775139,
+    "path" : "C:/Users/miked/git/Factor-Model/results/20200424/stats.csv",
+    "project_path" : "results/20200424/stats.csv",
+    "properties" : {
+        "cursorPosition" : "5,33",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 17,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "text"
+}

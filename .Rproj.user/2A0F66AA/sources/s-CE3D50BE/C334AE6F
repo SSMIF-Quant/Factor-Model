@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592775366864.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1132070786",
+    "id" : "C334AE6F",
+    "lastKnownWriteTime" : 1592775138,
+    "last_content_update" : 1592775138,
+    "path" : "C:/Users/miked/git/Factor-Model/DataLoad.R",
+    "project_path" : "DataLoad.R",
+    "properties" : {
+        "cursorPosition" : "198,31",
+        "scrollLine" : "185"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
