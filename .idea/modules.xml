@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/fm_python.iml" filepath="$PROJECT_DIR$/.idea/fm_python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Factor-Model.iml" filepath="$PROJECT_DIR$/.idea/Factor-Model.iml" />
     </modules>
   </component>
 </project>
