@@ -28,7 +28,13 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="mdigreg2 &lt;mdigreg2@stevens.edu&gt;" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SIGN_OFF_COMMIT" value="true" />
   </component>
   <component name="ProjectId" id="1fLbBNnPMJ5WNQZIh7D6nLh2WCY" />
   <component name="PropertiesComponent">
