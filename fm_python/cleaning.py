@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import Union
-from .decorators import NonNullArgs
+from decorators import NonNullArgs
 
 
 @NonNullArgs

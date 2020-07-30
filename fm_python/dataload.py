@@ -1,8 +1,8 @@
 import pandas as pd
 import pdblp
 from typing import List
-from .helpers import blpstring, write_datasets_to_file, load_dataset
-from .constants import sectors, sector_valuation_fields, start_date, end_date, macroeconomic_indices,\
+from helpers import blpstring, write_datasets_to_file, load_dataset
+from constants import sectors, sector_valuation_fields, start_date, end_date, macroeconomic_indices,\
                       sector_etfs, sentiment_fields, ROOT_DIR, CLEAN_DATA_FOLDER, VALUATION_DATA_PATH_WIN,\
                       MACROECONOMIC_DATA_PATH_WIN, SENTIMENT_DATA_PATH_WIN
 
@@ -30,8 +30,8 @@ except BaseException:
 try:
     paths: List[str] = [VALUATION_DATA_PATH_WIN, MACROECONOMIC_DATA_PATH_WIN, SENTIMENT_DATA_PATH_WIN]
     datasets: List[List[pd.DataFrame]] = [valuation_data, macroeconomic_data, sentiment_data]
-
-    write_datasets_to_file(paths, datasets)
+    labels : List[List[str]] = [sectors, macroeconomic_indices, sector_etfs]
+    write_datasets_to_file(paths, datasets, labels)
 
 except FileNotFoundError:
     print("cannot find clean data folder")

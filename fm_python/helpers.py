@@ -1,9 +1,21 @@
 from datetime import date
 from typing import List
 import pandas as pd
-from .cleaning import fill_na
-from .decorators import NonNullArgs
+from cleaning import fill_na
+from decorators import NonNullArgs
+from typing import List, Any
+from os import listdir
 
+
+@NonNullArgs
+def list_files(directory: str, extension: str) -> Any:
+    """
+    List all of the files with a certain extension in a directory
+    :param directory: directory in which to search (first level)
+    :param extension: extension to search for (ex: csv, py, java, ...)
+    :return: a list of strings of filepaths
+    """
+    return (f for f in listdir(directory) if f.endswith('.' + extension))
 
 @NonNullArgs
 def blpstring(d: date, fmt="block") -> str:
@@ -19,14 +31,17 @@ def blpstring(d: date, fmt="block") -> str:
 
 
 @NonNullArgs
-def write_datasets_to_file(paths: List[str], frames: List[List[pd.DataFrame]]) -> None:
+def write_datasets_to_file(paths: List[str], frames_lists: List[List[pd.DataFrame]], labels_list: List[str]) -> None:
     """
     :param paths: a list of filepaths
-    :param frames: a list of lists of dataframes
+    :param frames_lists: a list of lists of dataframes
     """
-    for path, frame in zip(paths, frames):
-        with open(path, "w"):
-            pd.concat(frame).to_csv(path)
+    for path, frames, labels in zip(paths, frames_lists, labels_list):
+        for frame, label in zip(frames, labels):
+            save_path: str = path.split(".csv")[0]
+            save_path += (label + ".csv")
+            with open(save_path, "w"):
+                frame.to_csv(save_path)
 
 
 @NonNullArgs
