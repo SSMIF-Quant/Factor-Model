@@ -9,6 +9,9 @@ VALUATION_DATA_PATH_WIN: str = f"{ROOT_DIR}\\{CLEAN_DATA_FOLDER}\\valuation_data
 MACROECONOMIC_DATA_PATH_WIN: str = f"{ROOT_DIR}\\{CLEAN_DATA_FOLDER}\\macroeconomic_data.csv"
 SENTIMENT_DATA_PATH_WIN: str = f"{ROOT_DIR}\\{CLEAN_DATA_FOLDER}\\sentiment_data.csv"
 
+train_size: int = 0.8
+# number of days to leave between train and test sets
+gap: int = 10
 start_date: date = date(2019, 1, 1)
 end_date: date = date(2020, 1, 1)
 

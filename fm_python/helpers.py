@@ -1,11 +1,11 @@
 from datetime import date
 from typing import List
 import pandas as pd
+import numpy as np
 from cleaning import fill_na
 from decorators import NonNullArgs
-from typing import List, Any
+from typing import List, Any, Dict
 from os import listdir
-
 
 @NonNullArgs
 def list_files(directory: str, extension: str) -> Any:
@@ -45,7 +45,8 @@ def write_datasets_to_file(paths: List[str], frames_lists: List[List[pd.DataFram
 
 
 @NonNullArgs
-def load_dataset(dataset_names: List[str], dataset_valuation_fields: List[str], start_date: date, end_date: date, con) -> List[pd.DataFrame]:
+def load_dataset(dataset_names: List[str], dataset_valuation_fields: List[str], colnames: List[str], start_date: date,
+                 end_date: date, con) -> List[pd.DataFrame]:
     """
     :param dataset_names: list of dataset names to be passed into the con object : List[str]
     :param dataset_valuation_fields: list of fields to pull for each dataset from the con object : List[str]
@@ -56,11 +57,30 @@ def load_dataset(dataset_names: List[str], dataset_valuation_fields: List[str], 
              in every dataset : List[pd.DataFrame]
     """
     output_data = []
+    index: int = 0
     for index in dataset_names:
         frame: pd.DataFrame = con.bdh([index], dataset_valuation_fields, blpstring(start_date), blpstring(end_date))
+        frame.columns = colnames[index]
+        frame.drop(labels=["field", "date"])
         frame = fill_na(frame)
         output_data.append(frame)
+        index += 1
     return output_data
 
 
+@NonNullArgs
+def train_test_split(X, Y, train_size=0.8, gap=10):
+    assert (len(X) == len(Y))
+    n: int = len(X)
+    print(n)
+    train_end: int = int(n * train_size)
+    print(train_end)
+    assert ((train_end + gap) < n)
+    test_start: int = train_end + gap
 
+    x_tr = X[:train_end]
+    x_te = X[test_start:]
+    y_tr = Y[:train_end]
+    y_te = Y[test_start:]
+
+    return x_tr, x_te, y_tr, y_te

@@ -2,17 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76345749-822a-4fd6-8558-979121c43419" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/fm_python/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/linear_regression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/clean_data/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/clean_data/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/cleaning.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/cleaning.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/constants.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/dataload.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/dataload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/decorators.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/decorators.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/data_processing/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/linear_regression/constants.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/linear_regression/dataload.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/linear_regression/linear_regression.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fm_python/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fm_python/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fm_python/linear_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/linear_regression.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -212,15 +206,6 @@
     </option>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fm_python/linear_regression.py</url>
-          <line>16</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="spx" />
