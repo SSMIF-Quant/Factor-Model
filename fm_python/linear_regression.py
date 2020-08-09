@@ -18,11 +18,11 @@ def main() -> None:
     sector_log_price_predictions: Dict = dict()
     sector_coefficients: Dict = dict()
     sector_mse: Dict = dict()
-    sector_msle: Dict = dict()
-    sector_mean_tweedie_deviance: Dict = dict()
-    sector_mean_poisson_deviance: Dict = dict()
+    # sector_msle: Dict = dict()
+    # sector_mean_tweedie_deviance: Dict = dict()
+    # sector_mean_poisson_deviance: Dict = dict()
     sector_mean_absolute_error: Dict = dict()
-    sector_mean_gamma_deviance: Dict = dict()
+    # sector_mean_gamma_deviance: Dict = dict()
     sector_r2_score: Dict = dict()
 
     X_train: Dict = dict()
@@ -33,12 +33,11 @@ def main() -> None:
     for sector in sectors:
         # First add valuation data
         sector_paths = [filepath for filepath in filepaths if filepath.__contains__(sector)]
-
         # Then read the csvs
         data = [pd.read_csv(f"{CLEAN_DATA_FOLDER}\\{path}") for path in sector_paths]
 
         # Put them all together (one sector's data)
-        dataset = pd.concat(data).drop(columns=["field"])
+        dataset = pd.concat(data).drop(columns=["date"])
 
         # dataset.droplevel(0)
         # print(dataset.head())
@@ -50,12 +49,17 @@ def main() -> None:
 
         # Datasets are now of the form {'S5FNIL Index' : pd.DataFrame(valuation data + macroeconomic data)}
         x_tr, x_te, y_tr, y_te = train_test_split(X, Y, train_size=train_size, gap=gap)
-
+        print(f"xtr na {x_tr.isna().sum()}")
+        print(f"ytr na {y_tr.isna().sum()}")
+        print(f"xte na {x_te.isna().sum()}")
+        print(f"yte na {y_te.isna().sum()}")
+        print(sector)
+        print(y_te.head(30))
         # Then save
         X_train[sector] = x_tr
         y_train[sector] = y_tr
         X_test[sector] = x_te
-        y_test[sector] = x_te
+        y_test[sector] = y_te
 
         model = LinearRegression()
 
@@ -66,11 +70,11 @@ def main() -> None:
 
         sector_log_price_predictions[sector] = model_predictions
         sector_mse[sector] = mean_squared_error(y_te, model_predictions)
-        sector_msle[sector] = mean_squared_log_error(y_te, model_predictions)
-        sector_mean_tweedie_deviance[sector] = mean_tweedie_deviance(y_te, model_predictions)
-        sector_mean_poisson_deviance[sector] = mean_poisson_deviance(y_te, model_predictions)
+        # sector_msle[sector] = mean_squared_log_error(y_te, model_predictions)
+        # sector_mean_tweedie_deviance[sector] = mean_tweedie_deviance(y_te, model_predictions)
+        # sector_mean_poisson_deviance[sector] = mean_poisson_deviance(y_te, model_predictions)
         sector_mean_absolute_error[sector] = mean_absolute_error(y_te, model_predictions)
-        sector_mean_gamma_deviance[sector] = mean_gamma_deviance(y_te, model_predictions)
+        # sector_mean_gamma_deviance[sector] = mean_gamma_deviance(y_te, model_predictions)
         sector_r2_score[sector] = r2_score(y_te, model_predictions)
 
 

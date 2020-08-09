@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76345749-822a-4fd6-8558-979121c43419" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/fm_python/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fm_python/helper.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fm_python/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fm_python/dataload.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/dataload.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fm_python/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/helpers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fm_python/linear_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/fm_python/linear_regression.py" afterDir="false" />
     </list>
@@ -57,28 +57,7 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.linear_regression">
-    <configuration name="dataload (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Factor-Model" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_processing" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_processing/dataload.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="dataload (2)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="dataload" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Factor-Model" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -87,27 +66,6 @@
       </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fm_python/" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\miked\git\Factor-Model\fm_python\dataload.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="dataload (3)" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Factor-Model" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fm_python" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -141,6 +99,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="helper" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Factor-Model" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fm_python" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fm_python/helper.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="linear_regression" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Factor-Model" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -164,18 +143,15 @@
     </configuration>
     <list>
       <item itemvalue="Python.dataload" />
-      <item itemvalue="Python.dataload (1)" />
-      <item itemvalue="Python.dataload (2)" />
-      <item itemvalue="Python.dataload (3)" />
       <item itemvalue="Python.linear_regression" />
+      <item itemvalue="Python.helper" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.linear_regression" />
-        <item itemvalue="Python.dataload (3)" />
-        <item itemvalue="Python.dataload (2)" />
         <item itemvalue="Python.dataload" />
-        <item itemvalue="Python.dataload (1)" />
+        <item itemvalue="Python.helper" />
+        <item itemvalue="Python.dataload" />
       </list>
     </recent_temporary>
   </component>

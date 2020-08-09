@@ -46,25 +46,28 @@ def write_datasets_to_file(paths: List[str], frames_lists: List[List[pd.DataFram
 
 @NonNullArgs
 def load_dataset(dataset_names: List[str], dataset_valuation_fields: List[str], colnames: List[str], start_date: date,
-                 end_date: date, con) -> List[pd.DataFrame]:
+                 end_date: date, con, case: str =None) -> List[pd.DataFrame]:
     """
     :param dataset_names: list of dataset names to be passed into the con object : List[str]
     :param dataset_valuation_fields: list of fields to pull for each dataset from the con object : List[str]
     :param start_date: start date of the data : datetime.date
     :param end_date: end date of the data : datetime.date
     :param con: connector object for the pdblp api or a database connection object with a matching interface
+    :param case: controls special behavior of the function
     :return: A list of dataframes corresponding to those requested with each valuation field as a column
              in every dataset : List[pd.DataFrame]
     """
     output_data = []
-    index: int = 0
+    i: int = 0
     for index in dataset_names:
-        frame: pd.DataFrame = con.bdh([index], dataset_valuation_fields, blpstring(start_date), blpstring(end_date))
-        frame.columns = colnames[index]
-        frame.drop(labels=["field", "date"])
+        frame = con.bdh([index], dataset_valuation_fields, blpstring(start_date), blpstring(end_date))
+        if case == "macro":
+            frame.columns = ["PX_LAST"]
+        elif case != "macro":
+            frame.columns = colnames
         frame = fill_na(frame)
         output_data.append(frame)
-        index += 1
+        i += 1
     return output_data
 
 
@@ -72,9 +75,7 @@ def load_dataset(dataset_names: List[str], dataset_valuation_fields: List[str], 
 def train_test_split(X, Y, train_size=0.8, gap=10):
     assert (len(X) == len(Y))
     n: int = len(X)
-    print(n)
     train_end: int = int(n * train_size)
-    print(train_end)
     assert ((train_end + gap) < n)
     test_start: int = train_end + gap
 
