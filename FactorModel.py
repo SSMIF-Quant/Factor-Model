@@ -238,7 +238,7 @@ class FactorModel:
         return graphJSON
 
     def getActualAllocations(self, percentages=True):
-        cur_holdings = json.loads(json.loads(holdings.getHoldingsFromCSV()))
+        cur_holdings = json.loads(json.loads(holdings.getHoldings()))
         allocations = {v: 0 for k, v in SECTOR_DICT.items()}
         total_holdings = sum([holding['Current_Value_MTM'] for holding in cur_holdings])
 
