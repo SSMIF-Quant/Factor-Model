@@ -238,9 +238,10 @@ class FactorModel:
         return graphJSON
 
     def getActualAllocations(self, percentages=True):
-        cur_holdings = json.loads(json.loads(holdings.getHoldings()))
+        #cur_holdings = json.dumps({"Ticker":"VZ","Company":"Verizon","Sector":"Communications","Current_Value_MTM":"100000"})
+        cur_holdings = json.loads(json.dumps(holdings.getHoldings()))
         allocations = {v: 0 for k, v in SECTOR_DICT.items()}
-        total_holdings = sum([holding['Current_Value_MTM'] for holding in cur_holdings])
+        total_holdings = sum([float(holding['Current_Value_MTM'].replace("$","").replace(",","")) for holding in cur_holdings])
 
         # Add up allocations to each sector in dollar amounts
         for holding in cur_holdings:
@@ -248,9 +249,9 @@ class FactorModel:
             if holding['Ticker'] == 'VOO':
                 sp500_weights = self.getSPWeights()
                 for sector, weight in sp500_weights.items():
-                    allocations[SECTOR_DICT.get(sector, 'Other')] += holding['Current_Value_MTM'] * weight
+                    allocations[SECTOR_DICT.get(sector, 'Other')] += float(holding['Current_Value_MTM'].replace("$","").replace(",","")) * weight
             else:
-                allocations[SECTOR_DICT.get(holding['Sector'], 'Other')] += holding['Current_Value_MTM']
+                allocations[SECTOR_DICT.get(holding['Sector'], 'Other')] += float(holding['Current_Value_MTM'].replace("$","").replace(",",""))
         # Calculate percentage of each sector as % of total
         if percentages:
             for k, v in allocations.items():
