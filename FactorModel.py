@@ -9,7 +9,11 @@ import json
 import plotly
 import plotly.graph_objs as go
 import os
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import requests
 import re
 import importlib
@@ -238,7 +242,6 @@ class FactorModel:
         return graphJSON
 
     def getActualAllocations(self, percentages=True):
-        #cur_holdings = json.dumps({"Ticker":"VZ","Company":"Verizon","Sector":"Communications","Current_Value_MTM":"100000"})
         cur_holdings = json.loads(json.dumps(holdings.getHoldings()))
         allocations = {v: 0 for k, v in SECTOR_DICT.items()}
         total_holdings = sum([float(holding['Current_Value_MTM'].replace("$","").replace(",","")) for holding in cur_holdings])
@@ -271,25 +274,104 @@ class FactorModel:
         return cur_weights
 
     def getSPWeights(self):
+        
         if 'SP500Weights.txt' in os.listdir(self.model_path):
             weights = json.loads(open(os.path.join(self.model_path, 'SP500Weights.txt')).read())
             if datetime.now().date() - datetime.strptime(weights['Date'], '%Y-%m-%d').date() <= timedelta(days=7):
                 weights.pop('Date')
                 return weights
-        html = requests.get("https://us.spindices.com/indices/equity/sp-500")
-        soup = BeautifulSoup(html.content, features="lxml")
-        scripts = str(soup.find_all("script"))
-        p = re.search('var indexData = (.*?);', scripts)
-        indexData = json.loads('' + p[1] + '')
+        
+        driver = webdriver.Chrome(executable_path=os.path.join(self.model_path, './chromedriver_win32/chromedriver.exe'))
+        driver.get("https://www.spglobal.com/spdji/en/indices/equity/sp-500/#data")
+        delay = 3 # seconds
 
         sectorWeights = {}
-        for i in range(len(indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"])):
-            sector = indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"][i]["sectorDescription"]
-            weight = indexData["indexSectorBreakdownHolder"]["indexSectorBreakdown"][i]["marketCapitalPercentage"]
-            sectorWeights[sector] = weight
+
+        try:
+            #content = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'donut-table-row')))
+            sectorWeights["Information Technology"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[1]/div[2]/span'))).text).replace("%",""))/100
+            print("Information Technology ready")
+        except TimeoutException:
+            print("Information Technology failed")
+            sectorWeights["Information Technology"] = 0.0
+
+        try:
+            sectorWeights["Health Care"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[2]/div[2]/span'))).text).replace("%",""))/100
+            print("Health Care ready")
+        except TimeoutException:
+            print("Health Care failed")
+            sectorWeights["Health Care"] = 0.0
+
+        try:
+            sectorWeights["Consumer Discretionary"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[3]/div[2]/span'))).text).replace("%",""))/100
+            print("Consumer Discretionary ready")
+        except TimeoutException:
+            print("Consumer Discretionary failed")
+            sectorWeights["Consumer Discretionary"] = 0.0
+
+        try:
+            sectorWeights["Communication Services"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[4]/div[2]/span'))).text).replace("%",""))/100
+            print("Communication Services ready")
+        except TimeoutException:
+            print("Communication Services failed")
+            sectorWeights["Communication Services"] = 0.0
+
+        try:
+            sectorWeights["Financials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[5]/div[2]/span'))).text).replace("%",""))/100
+            print("Financials ready")
+        except TimeoutException:
+            print("Financials failed")
+            sectorWeights["Financials"] = 0.0
+
+        try:
+            sectorWeights["Industrials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[6]/div[2]/span'))).text).replace("%",""))/100
+            print("Industrials ready")
+        except TimeoutException:
+            print("Industrials failed")
+            sectorWeights["Industrials"] = 0.0
+
+        try:
+            sectorWeights["Consumer Staples"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[7]/div[2]/span'))).text).replace("%",""))/100
+            print("Consumer Staples ready")
+        except TimeoutException:
+            print("Consumer Staples failed")
+            sectorWeights["Consumer Staples"] = 0.0
+
+        try:
+            sectorWeights["Utilities"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[8]/div[2]/span'))).text).replace("%",""))/100
+            print("Utilities ready")
+        except TimeoutException:
+            print("Utilities failed")
+            sectorWeights["Utilities"] = 0.0
+
+        try:
+            #THIS IS Real Estate...
+            sectorWeights["Other"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[9]/div[2]/span'))).text).replace("%",""))/100
+            print("Real Estate ready")
+        except TimeoutException:
+            print("Real Estate failed")
+            sectorWeights["Other"] = 0.0
+
+        try:
+            sectorWeights["Materials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[10]/div[2]/span'))).text).replace("%",""))/100
+            print("Materials ready")
+        except TimeoutException:
+            print("Materials failed")
+            sectorWeights["Materials"] = 0.0
+
+        try:
+            sectorWeights["Energy"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[11]/div[2]/span'))).text).replace("%",""))/100
+            print("Energy ready")
+        except TimeoutException:
+            print("Energy failed")
+            sectorWeights["Energy"] = 0.0
+        
+        driver.close()
 
         sectorWeights['Date'] = datetime.now().date().strftime('%Y-%m-%d')
         f = open(os.path.join(self.model_path, 'SP500Weights.txt'), 'w')
         f.write(json.dumps(sectorWeights))
+        f.close()
+        print("Wrote weights successfully")
         sectorWeights.pop('Date')
         return sectorWeights
