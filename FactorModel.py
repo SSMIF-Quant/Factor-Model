@@ -286,96 +286,98 @@ class FactorModel:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome(executable_path=os.path.join(self.model_path, './chromedriver_linux64/chromedriver'), chrome_options=chrome_options)
-        driver.get("https://www.spglobal.com/spdji/en/indices/equity/sp-500/#data")
+        driver = webdriver.Chrome(executable_path=os.path.join(self.model_path, './chromedriver_win32/chromedriver'), chrome_options=chrome_options)
+        driver.get("https://finance.yahoo.com/quote/SPY/holdings/?guccounter=1")
         delay = 3 # seconds
-
+        
         sectorWeights = {}
 
         try:
             #content = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'donut-table-row')))
-            sectorWeights["Information Technology"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[1]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Information Technology"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[12]/span[3]'))).text).replace("%",""))/100
             print("Information Technology ready")
         except TimeoutException:
             try:
-                sectorWeights["Information Technology"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[1]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Information Technology"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[12]/span[3]'))).text).replace("%",""))/100
                 print("Information Technology ready")
             except TimeoutException:
                 print("Information Technology failed")
                 sectorWeights["Information Technology"] = 0.0
 
         try:
-            sectorWeights["Health Care"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[2]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Health Care"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[7]/span[3]'))).text).replace("%",""))/100
             print("Health Care ready")
         except TimeoutException:
             try:
-                sectorWeights["Health Care"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[2]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Health Care"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[7]/span[3]'))).text).replace("%",""))/100
                 print("Health Care ready")
             except TimeoutException:
                 print("Health Care failed")
                 sectorWeights["Health Care"] = 0.0
 
         try:
-            sectorWeights["Consumer Discretionary"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[3]/div[2]/span'))).text).replace("%",""))/100
+            # This is consumer cyclical
+            sectorWeights["Consumer Discretionary"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[3]/span[3]'))).text).replace("%",""))/100
             print("Consumer Discretionary ready")
         except TimeoutException:
             try:
-                sectorWeights["Consumer Discretionary"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[3]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Consumer Discretionary"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[3]/span[3]'))).text).replace("%",""))/100
                 print("Consumer Discretionary ready")
             except TimeoutException:
                 print("Consumer Discretionary failed")
                 sectorWeights["Consumer Discretionary"] = 0.0
 
         try:
-            sectorWeights["Communication Services"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[4]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Communication Services"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[9]/span[3]'))).text).replace("%",""))/100
             print("Communication Services ready")
         except TimeoutException:
             try:
-                sectorWeights["Communication Services"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[4]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Communication Services"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[9]/span[3]'))).text).replace("%",""))/100
                 print("Communication Services ready")
             except TimeoutException:
                 print("Communication Services failed")
                 sectorWeights["Communication Services"] = 0.0
 
         try:
-            sectorWeights["Financials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[5]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Financials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[4]/span[3]'))).text).replace("%",""))/100
             print("Financials ready")
         except TimeoutException:
             try:
-                sectorWeights["Financials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[5]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Financials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[4]/span[3]'))).text).replace("%",""))/100
                 print("Financials ready")
             except TimeoutException:
                 print("Financials failed")
                 sectorWeights["Financials"] = 0.0
 
         try:
-            sectorWeights["Industrials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[6]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Industrials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[11]/span[3]'))).text).replace("%",""))/100
             print("Industrials ready")
         except TimeoutException:
             try:
-                sectorWeights["Industrials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[6]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Industrials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[11]/span[3]'))).text).replace("%",""))/100
                 print("Industrials ready")
             except TimeoutException:
                 print("Industrials failed")
                 sectorWeights["Industrials"] = 0.0
 
         try:
-            sectorWeights["Consumer Staples"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[7]/div[2]/span'))).text).replace("%",""))/100
+            # This is consumer defensive
+            sectorWeights["Consumer Staples"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[6]/span[3]'))).text).replace("%",""))/100
             print("Consumer Staples ready")
         except TimeoutException:
             try:
-                sectorWeights["Consumer Staples"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[7]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Consumer Staples"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[6]/span[3]'))).text).replace("%",""))/100
                 print("Consumer Staples ready")
             except TimeoutException:
                 print("Consumer Staples failed")
                 sectorWeights["Consumer Staples"] = 0.0
 
         try:
-            sectorWeights["Utilities"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[8]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Utilities"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[8]/span[3]'))).text).replace("%",""))/100
             print("Utilities ready")
         except TimeoutException:
             try:
-                sectorWeights["Utilities"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[8]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Utilities"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[8]/span[3]'))).text).replace("%",""))/100
                 print("Utilities ready")
             except TimeoutException:
                 print("Utilities failed")
@@ -383,33 +385,33 @@ class FactorModel:
 
         try:
             #THIS IS Real Estate...
-            sectorWeights["Other"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[9]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Other"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[5]/span[3]'))).text).replace("%",""))/100
             print("Real Estate ready")
         except TimeoutException:
             try:
-                sectorWeights["Other"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[9]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Other"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[5]/span[3]'))).text).replace("%",""))/100
                 print("Real Estate ready")
             except TimeoutException:
                 print("Real Estate failed")
                 sectorWeights["Other"] = 0.0
 
         try:
-            sectorWeights["Materials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[10]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Materials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[2]/span[3]'))).text).replace("%",""))/100
             print("Materials ready")
         except TimeoutException:
             try:
-                sectorWeights["Materials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[10]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Materials"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[2]/span[3]'))).text).replace("%",""))/100
                 print("Materials ready")
             except TimeoutException:
                 print("Materials failed")
                 sectorWeights["Materials"] = 0.0
 
         try:
-            sectorWeights["Energy"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[11]/div[2]/span'))).text).replace("%",""))/100
+            sectorWeights["Energy"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[10]/span[3]'))).text).replace("%",""))/100
             print("Energy ready")
         except TimeoutException:
             try:
-                sectorWeights["Energy"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="data-sector-breakdown"]/section[1]/div[2]/div[2]/div[11]/div[2]/span'))).text).replace("%",""))/100
+                sectorWeights["Energy"] = float(str(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@id="Col1-0-Holdings-Proxy"]/section/div[1]/div[2]/div/div[10]/span[3]'))).text).replace("%",""))/100
                 print("Energy ready")
             except TimeoutException:
                 print("Energy failed")
